@@ -4,10 +4,11 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { AdminDateRangePreset } from "@/lib/analytics/types";
+
+type AdminRange = "7d" | "30d" | "90d";
 
 interface AnalyticsFiltersProps {
-  currentRange: AdminDateRangePreset;
+  currentRange: AdminRange;
 }
 
 export function AnalyticsFilters({ currentRange }: AnalyticsFiltersProps) {
@@ -16,15 +17,15 @@ export function AnalyticsFilters({ currentRange }: AnalyticsFiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const ranges: AdminDateRangePreset[] = ["7d", "30d", "90d"];
+  const ranges: AdminRange[] = ["7d", "30d", "90d"];
 
-  function updateRange(r: AdminDateRangePreset) {
+  function updateRange(r: AdminRange) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("range", r);
     router.replace(`${pathname}?${params.toString()}`);
   }
 
-  const rangeLabels: Record<AdminDateRangePreset, string> = {
+  const rangeLabels: Record<AdminRange, string> = {
     "7d": t("range7d"),
     "30d": t("range30d"),
     "90d": t("range90d"),
