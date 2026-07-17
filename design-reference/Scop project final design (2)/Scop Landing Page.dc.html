@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600;700&amp;family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#43978D; --green-deep:#264D59; --cream:#F6F4EE; --card:#FFFFFF; --border:#E2E6E4;
+    --ink:#1C2427; --ink-soft:#57646B; --ink-faint:#93A0A2;
+    --amber:#F9AD6A; --amber-bg:#FFF3E6;
+    --red:#D46C4E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);}
+  a{color:var(--green-deep);}
+  a:hover{color:var(--green);}
+  [dir="rtl"] * { font-family: 'Cairo', sans-serif !important; }
+  html{scroll-behavior:smooth;}
+  @keyframes lpFade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes lpPulse{0%{box-shadow:0 0 0 0 rgba(67,151,141,.4);}70%{box-shadow:0 0 0 9px rgba(67,151,141,0);}100%{box-shadow:0 0 0 0 rgba(67,151,141,0);}}
+  @keyframes lpFloat{0%,100%{transform:translateY(0) translateX(0);}50%{transform:translateY(-16px) translateX(8px);}}
+  @keyframes lpFloat2{0%,100%{transform:translateY(0) translateX(0);}50%{transform:translateY(14px) translateX(-10px);}}
+  button{transition:transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s cubic-bezier(.16,1,.3,1), background .25s ease;}
+  button:hover{transform:translateY(-2px);}
+  button:active{transform:translateY(0px) scale(.97);}
+  [data-nav-link]{position:relative;transition:color .2s ease;}
+  [data-nav-link]::after{content:'';position:absolute;insetInlineStart:0;bottom:-4px;width:0;height:2px;background:var(--green);transition:width .3s cubic-bezier(.16,1,.3,1);}
+  [data-nav-link]:hover{color:var(--green-deep) !important;}
+  [data-nav-link]:hover::after{width:100%;}
+  [data-mock-row]{transition:background .2s ease, transform .2s ease;}
+  [data-mock-row]:hover{background:var(--cream);transform:translateX(2px);}
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="background:var(--cream);color:var(--ink);font-family:'Inter',sans-serif;overflow-x:hidden;">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:20px {{ sidePad }};maxWidth:1280px;marginInline:auto;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;border-radius:10px;background:var(--green-deep);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:17px;">S</div>
+      <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:20px;color:var(--green-deep);">{{ t.appName }}</span>
+    </div>
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;align-items:center;gap:32px;">
+        <span data-nav-link style="fontSize:14px;fontWeight:500;color:var(--ink-soft);cursor:pointer;">{{ t.nav_features }}</span>
+        <span data-nav-link style="fontSize:14px;fontWeight:500;color:var(--ink-soft);cursor:pointer;">{{ t.nav_pricing }}</span>
+        <span data-nav-link style="fontSize:14px;fontWeight:500;color:var(--ink-soft);cursor:pointer;">{{ t.nav_faq }}</span>
+      </nav>
+    </sc-if>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="display:flex;background:var(--card);border:0.5px solid var(--border);borderRadius:10px;padding:3px;gap:2px;font-family:'IBM Plex Mono',monospace;fontSize:11px;fontWeight:600;">
+        <button onClick="{{ goEn }}" style="{{ langEnBtn }}">EN</button>
+        <button onClick="{{ goAr }}" style="{{ langArBtn }}">AR</button>
+      </div>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <span style="fontSize:13.5px;fontWeight:600;color:var(--ink);cursor:pointer;">{{ t.nav_login }}</span>
+      </sc-if>
+      <button style="background:var(--green-deep);color:#fff;border:none;borderRadius:10px;padding:10px 18px;fontSize:13.5px;fontWeight:600;cursor:pointer;whiteSpace:nowrap;">{{ t.nav_trial }}</button>
+    </div>
+  </header>
+
+  <section style="maxWidth:1280px;marginInline:auto;padding:{{ heroPad }};display:flex;flexDirection:{{ heroDir }};alignItems:center;gap:48px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-60px;insetInlineEnd:-60px;width:220px;height:220px;borderRadius:50%;background:radial-gradient(circle,#9ED0C755,transparent 70%);animation:lpFloat 9s ease-in-out infinite;pointerEvents:none;"></div>
+    <div style="position:absolute;bottom:-40px;insetInlineStart:10%;width:160px;height:160px;borderRadius:50%;background:radial-gradient(circle,#F9AD6A33,transparent 70%);animation:lpFloat2 11s ease-in-out infinite;pointerEvents:none;"></div>
+    <div style="flex:1;minWidth:0;animation:lpFade .4s ease;">
+      <span style="fontFamily:'IBM Plex Mono',monospace;fontSize:11.5px;fontWeight:700;background:var(--amber-bg);color:#A85A1E;padding:5px 12px;borderRadius:999px;textTransform:uppercase;letterSpacing:.03em;">{{ t.hero_kicker }}</span>
+      <h1 style="fontFamily:'Outfit',sans-serif;fontWeight:700;fontSize:{{ heroTitleSize }};lineHeight:1.08;color:var(--green-deep);margin:20px 0 0;letterSpacing:-.01em;animation:lpFade .5s ease .05s backwards;">{{ t.hero_title }}</h1>
+      <p style="fontSize:17px;lineHeight:1.6;color:var(--ink-soft);margin:20px 0 0;maxWidth:520px;animation:lpFade .5s ease .15s backwards;">{{ t.hero_sub }}</p>
+      <div style="display:flex;gap:14px;marginTop:28px;flexWrap:wrap;animation:lpFade .5s ease .25s backwards;">
+        <button style="background:var(--green-deep);color:#fff;border:none;borderRadius:12px;padding:15px 26px;fontSize:15px;fontWeight:600;cursor:pointer;box-shadow:0 8px 24px rgba(38,77,89,.18);" style-hover="background:#1d3d47;">{{ t.hero_cta_primary }}</button>
+        <button style="background:transparent;color:var(--green-deep);border:1.5px solid var(--border);borderRadius:12px;padding:15px 26px;fontSize:15px;fontWeight:600;cursor:pointer;" style-hover="background:var(--card);border-color:var(--green);">{{ t.hero_cta_secondary }}</button>
+      </div>
+      <div style="display:flex;alignItems:center;gap:8px;marginTop:22px;animation:lpFade .5s ease .35s backwards;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2.5"><path d="M4 12l5 5L20 6"></path></svg>
+        <span style="fontSize:13px;color:var(--ink-faint);">{{ t.hero_note }}</span>
+      </div>
+    </div>
+    <div style="flex:1;minWidth:0;width:100%;animation:lpFade .6s ease .2s backwards;">
+      <div style="background:var(--card);border:0.5px solid var(--border);borderRadius:22px;padding:22px;boxShadow:0 30px 70px rgba(15,45,32,.12);">
+        <div style="display:flex;align-items:center;justify-content:space-between;marginBottom:16px;">
+          <span style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:15px;color:var(--green-deep);">{{ t.mock_title }}</span>
+          <div style="display:flex;align-items:center;gap:5px;background:var(--cream);borderRadius:999px;padding:4px 10px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:lpPulse 2s infinite;"></span>
+            <span style="fontFamily:'IBM Plex Mono',monospace;fontSize:10px;fontWeight:600;color:var(--green);textTransform:uppercase;">{{ t.mock_live }}</span>
+          </div>
+        </div>
+        <div style="display:grid;gridTemplateColumns:repeat(3,1fr);gap:10px;marginBottom:16px;">
+          <div style="background:var(--cream);borderRadius:14px;padding:14px;borderTop:3px solid var(--green);animation:lpFade .5s cubic-bezier(.16,1,.3,1) .1s backwards;">
+            <div style="fontFamily:'IBM Plex Mono',monospace;fontSize:9.5px;color:var(--ink-faint);textTransform:uppercase;">{{ t.mock_done }}</div>
+            <div style="fontFamily:'Outfit',sans-serif;fontSize:22px;fontWeight:600;color:var(--green-deep);marginTop:4px;">26</div>
+          </div>
+          <div style="background:var(--cream);borderRadius:14px;padding:14px;borderTop:3px solid var(--amber);animation:lpFade .5s cubic-bezier(.16,1,.3,1) .2s backwards;">
+            <div style="fontFamily:'IBM Plex Mono',monospace;fontSize:9.5px;color:var(--ink-faint);textTransform:uppercase;">{{ t.mock_pending }}</div>
+            <div style="fontFamily:'Outfit',sans-serif;fontSize:22px;fontWeight:600;color:#A85A1E;marginTop:4px;">6</div>
+          </div>
+          <div style="background:var(--cream);borderRadius:14px;padding:14px;borderTop:3px solid var(--red);animation:lpFade .5s cubic-bezier(.16,1,.3,1) .3s backwards;">
+            <div style="fontFamily:'IBM Plex Mono',monospace;fontSize:9.5px;color:var(--ink-faint);textTransform:uppercase;">{{ t.mock_missed }}</div>
+            <div style="fontFamily:'Outfit',sans-serif;fontSize:22px;fontWeight:600;color:#9C3F26;marginTop:4px;">3</div>
+          </div>
+        </div>
+        <div style="display:flex;flexDirection:column;gap:2px;">
+          <sc-for list="{{ mockBranches }}" as="b" hint-placeholder-count="3">
+            <div data-mock-row style="display:flex;align-items:center;justify-content:space-between;padding:10px 4px;borderBottom:0.5px solid var(--border);borderRadius:8px;animation:{{ b.rowAnim }};">
+              <span style="fontSize:13px;fontWeight:600;color:var(--ink);">{{ b.name }}</span>
+              <span style="{{ b.chipStyle }}">{{ b.pct }}%</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="maxWidth:1280px;marginInline:auto;padding:0 {{ sidePad }} 60px;">
+    <div style="display:grid;gridTemplateColumns:{{ statsCols }};gap:20px;borderTop:0.5px solid var(--border);borderBottom:0.5px solid var(--border);padding:32px 0;">
+      <sc-for list="{{ trustStats }}" as="s" hint-placeholder-count="4">
+        <div data-reveal="{{ s.revealId }}" style="{{ s.revealStyle }}">
+          <div style="fontFamily:'Outfit',sans-serif;fontWeight:700;fontSize:30px;color:var(--green-deep);">{{ s.value }}</div>
+          <div style="fontSize:13px;color:var(--ink-faint);marginTop:4px;">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="maxWidth:1280px;marginInline:auto;padding:20px {{ sidePad }} 80px;">
+    <div style="textAlign:center;maxWidth:640px;marginInline:auto;marginBottom:48px;">
+      <span style="fontFamily:'IBM Plex Mono',monospace;fontSize:11px;fontWeight:700;color:var(--green);textTransform:uppercase;letterSpacing:.05em;">{{ t.features_kicker }}</span>
+      <h2 style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:{{ h2Size }};color:var(--green-deep);margin:12px 0 0;">{{ t.features_title }}</h2>
+    </div>
+    <div style="display:grid;gridTemplateColumns:{{ featuresCols }};gap:20px;">
+      <sc-for list="{{ features }}" as="f" hint-placeholder-count="6">
+        <div data-reveal="{{ f.revealId }}" style="{{ f.revealStyle }}" style-hover="transform:translateY(-4px);box-shadow:0 16px 32px rgba(15,45,32,.1);">
+          <div style="width:44px;height:44px;borderRadius:12px;background:{{ f.iconBg }};display:flex;align-items:center;justify-content:center;color:{{ f.iconColor }};marginBottom:16px;">{{ f.icon }}</div>
+          <div style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:16.5px;color:var(--ink);">{{ f.title }}</div>
+          <div style="fontSize:14px;color:var(--ink-soft);marginTop:8px;lineHeight:1.5;">{{ f.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:var(--green-deep);padding:{{ heroPad }};">
+    <div style="maxWidth:1280px;marginInline:auto;">
+      <div style="textAlign:center;maxWidth:640px;marginInline:auto;marginBottom:48px;">
+        <span style="fontFamily:'IBM Plex Mono',monospace;fontSize:11px;fontWeight:700;color:#9ED0C7;textTransform:uppercase;letterSpacing:.05em;">{{ t.pricing_kicker }}</span>
+        <h2 style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:{{ h2Size }};color:#fff;margin:12px 0 0;">{{ t.pricing_title }}</h2>
+        <p style="fontSize:15px;color:#C7D9D5;margin:12px 0 0;">{{ t.pricing_sub }}</p>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <div data-reveal="pricing" style="{{ pricingRevealStyle }}background:#fff;borderRadius:22px;padding:36px;width:420px;maxWidth:100%;" style-hover="transform:translateY(-3px);box-shadow:0 20px 50px rgba(0,0,0,.2);">
+          <div style="display:flex;alignItems:baseline;gap:8px;">
+            <span style="fontFamily:'Outfit',sans-serif;fontWeight:700;fontSize:44px;color:var(--green-deep);">50 SAR</span>
+            <span style="fontSize:14px;color:var(--ink-faint);">{{ t.pricing_per }}</span>
+          </div>
+          <p style="fontSize:13.5px;color:var(--ink-soft);marginTop:6px;">{{ t.pricing_note }}</p>
+          <div style="display:flex;flexDirection:column;gap:12px;marginTop:24px;paddingTop:24px;borderTop:0.5px solid var(--border);">
+            <sc-for list="{{ pricingFeatures }}" as="pf" hint-placeholder-count="5">
+              <div style="display:flex;gap:10px;alignItems:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2.5" style="flex-shrink:0;"><path d="M4 12l5 5L20 6"></path></svg>
+                <span style="fontSize:14px;color:var(--ink);">{{ pf }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <button style="background:var(--green-deep);color:#fff;border:none;borderRadius:12px;padding:15px;fontSize:15px;fontWeight:600;cursor:pointer;width:100%;marginTop:26px;">{{ t.hero_cta_primary }}</button>
+          <p style="fontSize:12px;color:var(--ink-faint);textAlign:center;marginTop:14px;">{{ t.pricing_enterprise }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="maxWidth:900px;marginInline:auto;padding:{{ heroPad }};">
+    <div style="textAlign:center;marginBottom:40px;">
+      <span style="fontFamily:'IBM Plex Mono',monospace;fontSize:11px;fontWeight:700;color:var(--green);textTransform:uppercase;letterSpacing:.05em;">{{ t.faq_kicker }}</span>
+      <h2 style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:{{ h2Size }};color:var(--green-deep);margin:12px 0 0;">{{ t.faq_title }}</h2>
+    </div>
+    <div style="display:flex;flexDirection:column;gap:2px;">
+      <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="5">
+        <div data-reveal="{{ q.revealId }}" onClick="{{ q.toggle }}" style="{{ q.revealStyle }}" style-hover="border-color:var(--green);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:15px;color:var(--ink);">{{ q.question }}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" strokeWidth="2.5" style="{{ q.chevronStyle }}flex-shrink:0;"><path d="M6 9l6 6 6-6"></path></svg>
+          </div>
+          <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+            <p style="fontSize:14px;color:var(--ink-soft);lineHeight:1.6;margin:12px 0 0;animation:lpFade .3s cubic-bezier(.16,1,.3,1);">{{ q.answer }}</p>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="maxWidth:1280px;marginInline:auto;padding:0 {{ sidePad }} 90px;">
+    <div data-reveal="cta" style="{{ ctaRevealStyle }}background:var(--card);border:0.5px solid var(--border);borderRadius:24px;padding:56px 40px;textAlign:center;">
+      <h2 style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:{{ h2Size }};color:var(--green-deep);margin:0;">{{ t.cta_title }}</h2>
+      <p style="fontSize:15px;color:var(--ink-soft);margin:12px 0 0;">{{ t.cta_sub }}</p>
+      <button style="background:var(--green-deep);color:#fff;border:none;borderRadius:12px;padding:15px 30px;fontSize:15px;fontWeight:600;cursor:pointer;marginTop:24px;" style-hover="background:#1d3d47;">{{ t.hero_cta_primary }}</button>
+    </div>
+  </section>
+
+  <footer style="borderTop:0.5px solid var(--border);padding:32px {{ sidePad }};">
+    <div style="maxWidth:1280px;marginInline:auto;display:flex;align-items:center;justify-content:space-between;flexWrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:24px;height:24px;border-radius:7px;background:var(--green-deep);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;">S</div>
+        <span style="fontFamily:'Outfit',sans-serif;fontWeight:600;fontSize:14px;color:var(--green-deep);">{{ t.appName }}</span>
+      </div>
+      <span style="fontSize:12.5px;color:var(--ink-faint);">{{ t.footer_copy }}</span>
+    </div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STR = {
+  en: {
+    appName:'Scop', nav_features:'Features', nav_pricing:'Pricing', nav_faq:'FAQ', nav_login:'Log in', nav_trial:'Start free trial',
+    hero_kicker:'For multi-branch restaurants', hero_title:'Your project under your eays\n',
+    hero_sub:'Scop replaces scattered WhatsApp checklists with live task tracking, food-safety logs, and scheduling — across every branch, in real time.',
+    hero_cta_primary:'Start 14-day free trial', hero_cta_secondary:'See how it works', hero_note:'No card required · Cancel anytime',
+    mock_title:'Owner dashboard', mock_live:'Live', mock_done:'Done', mock_pending:'Pending', mock_missed:'Missed',
+    features_kicker:'Everything, in one place', features_title:'Built for how restaurants actually run',
+    pricing_kicker:'Simple pricing', pricing_title:'One price, every branch', pricing_sub:'No setup fees. No hidden tiers.',
+    pricing_per:'per branch / month', pricing_note:'Includes 2 managers per branch at no extra cost.',
+    pricing_enterprise:'10+ branches? Get custom enterprise pricing.',
+    faq_kicker:'Questions', faq_title:'Frequently asked',
+    cta_title:'Ready to see it running your branches?', cta_sub:'Start your 14-day free trial — no card required.',
+    footer_copy:'© 2026 Scop. Made for restaurants in Saudi Arabia.',
+  },
+  ar: {
+    appName:'سكوب', nav_features:'المزايا', nav_pricing:'الأسعار', nav_faq:'الأسئلة الشائعة', nav_login:'تسجيل الدخول', nav_trial:'ابدأ تجربة مجانية',
+    hero_kicker:'لمطاعم متعددة الفروع', hero_title:'أدر كل فرع وكأنه الفرع الوحيد لديك.',
+    hero_sub:'يستبدل سكوب قوائم واتساب المبعثرة بمتابعة مهام مباشرة، وسجلات سلامة غذاء، وجدولة — عبر كل فرع، لحظة بلحظة.',
+    hero_cta_primary:'ابدأ تجربة مجانية 14 يومًا', hero_cta_secondary:'شاهد كيف يعمل', hero_note:'بدون بطاقة ائتمان · ألغِ في أي وقت',
+    mock_title:'لوحة تحكم المالك', mock_live:'مباشر', mock_done:'منجز', mock_pending:'قيد الانتظار', mock_missed:'فائت',
+    features_kicker:'كل شيء في مكان واحد', features_title:'مصمم لطريقة عمل المطاعم فعليًا',
+    pricing_kicker:'أسعار بسيطة', pricing_title:'سعر واحد، لكل فرع', pricing_sub:'بدون رسوم إعداد. بدون فئات مخفية.',
+    pricing_per:'لكل فرع / شهريًا', pricing_note:'يشمل مديرين لكل فرع دون تكلفة إضافية.',
+    pricing_enterprise:'10+ فروع؟ احصل على تسعير مؤسسات مخصص.',
+    faq_kicker:'أسئلة', faq_title:'الأسئلة الشائعة',
+    cta_title:'جاهز لتراه يدير فروعك؟', cta_sub:'ابدأ تجربتك المجانية لمدة 14 يومًا — بدون بطاقة ائتمان.',
+    footer_copy:'© 2026 سكوب. صُنع لمطاعم المملكة العربية السعودية.',
+  }
+};
+
+const ICON_PATHS = {
+  checklist: [React.createElement('rect',{key:'r',x:3,y:3,width:18,height:18,rx:3}), React.createElement('path',{key:'p',d:'M8 12l2.5 2.5L16 9'})],
+  thermometer: [React.createElement('path',{key:'p',d:'M12 2v9.5a3.5 3.5 0 1 1-1 0V2z'})],
+  calendar: [React.createElement('rect',{key:'r',x:3,y:4,width:18,height:17,rx:2.5}), React.createElement('path',{key:'p',d:'M3 9h18M8 2v4M16 2v4'})],
+  chart: [React.createElement('path',{key:'p1',d:'M3 3v18h18'}), React.createElement('path',{key:'p2',d:'M7 15l4-5 3 3 5-7'})],
+  branch: [React.createElement('path',{key:'p1',d:'M4 21V8l8-5 8 5v13'}), React.createElement('path',{key:'p2',d:'M9 21v-6h6v6'})],
+  globe: [React.createElement('circle',{key:'c',cx:12,cy:12,r:9}), React.createElement('path',{key:'p',d:'M3 12h18M12 3a13 13 0 0 1 0 18M12 3a13 13 0 0 0 0 18'})],
+};
+function makeIcon(key) {
+  return React.createElement('svg',{width:22,height:22,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2}, ...ICON_PATHS[key]);
+}
+
+const FEATURES = [
+  {icon:'checklist', bg:'#EAF4F2', color:'#1F5C54', title:{en:'Custom checklists', ar:'قوائم مخصصة'}, desc:{en:'Build daily, weekly, or monthly checklists — with photo, note, or number proof required per item.', ar:'أنشئ قوائم يومية أو أسبوعية أو شهرية — مع إثبات صورة أو ملاحظة أو رقم لكل عنصر.'}},
+  {icon:'thermometer', bg:'#FFF3E6', color:'#A85A1E', title:{en:'Food-safety standards', ar:'معايير سلامة الغذاء'}, desc:{en:'Set safe ranges once. Pass/fail is calculated automatically from what managers enter.', ar:'حدد النطاقات الآمنة مرة واحدة. يُحسب النجاح/الرسوب تلقائيًا مما يدخله المدراء.'}},
+  {icon:'calendar', bg:'#E7EDEF', color:'#17323A', title:{en:'Scheduling', ar:'الجدولة'}, desc:{en:'Plan training, inspections and audits across one branch or every branch at once.', ar:'خطط للتدريب والتفتيش والتدقيق لفرع واحد أو لكل الفروع دفعة واحدة.'}},
+  {icon:'chart', bg:'#EAF4F2', color:'#1F5C54', title:{en:'Real-time reporting', ar:'تقارير لحظية'}, desc:{en:'Completion and pass rates roll up live — no waiting for a manager\u2019s end-of-day message.', ar:'تتراكم معدلات الإنجاز والنجاح لحظيًا — دون انتظار رسالة نهاية اليوم من المدير.'}},
+  {icon:'branch', bg:'#FBEAE4', color:'#9C3F26', title:{en:'Multi-branch by design', ar:'متعدد الفروع بالتصميم'}, desc:{en:'Every branch has its own manager logins, data, and view — fully isolated, fully yours.', ar:'لكل فرع تسجيل دخول مدير مستقل وبياناته وعرضه الخاص — معزول بالكامل وملكك أنت.'}},
+  {icon:'globe', bg:'#FFF3E6', color:'#A85A1E', title:{en:'Fully bilingual', ar:'ثنائي اللغة بالكامل'}, desc:{en:'Arabic and English with true right-to-left layout — not a translated afterthought.', ar:'عربي وإنجليزي مع تخطيط من اليمين لليسار حقيقي — وليس ترجمة لاحقة.'}},
+];
+
+const FAQS = [
+  {q:{en:'Do I need a credit card to start the trial?', ar:'هل أحتاج بطاقة ائتمان لبدء التجربة؟'}, a:{en:'No — every new owner account gets 14 days free with no card required.', ar:'لا — يحصل كل حساب مالك جديد على 14 يومًا مجانًا دون الحاجة لبطاقة.'}},
+  {q:{en:'How does pricing work with multiple branches?', ar:'كيف يعمل التسعير مع فروع متعددة؟'}, a:{en:'It\u2019s 50 SAR per branch per month, with 2 managers included per branch at no extra cost.', ar:'50 ريالًا سعوديًا لكل فرع شهريًا، مع مديرين لكل فرع دون تكلفة إضافية.'}},
+  {q:{en:'What happens if I have 10 or more branches?', ar:'ماذا لو كان لدي 10 فروع أو أكثر؟'}, a:{en:'We don\u2019t auto-bill past that point — you\u2019ll get custom enterprise pricing through our sales team.', ar:'لا نقوم بالفوترة التلقائية بعد هذا الحد — ستحصل على تسعير مؤسسات مخصص عبر فريق المبيعات.'}},
+  {q:{en:'Can each branch manager only see their own branch?', ar:'هل يرى كل مدير فرع فرعه فقط؟'}, a:{en:'Yes — data isolation is enforced at the database level, not just in the interface.', ar:'نعم — يتم فرض عزل البيانات على مستوى قاعدة البيانات، وليس فقط في الواجهة.'}},
+  {q:{en:'Is Scop available in Arabic?', ar:'هل سكوب متاح بالعربية؟'}, a:{en:'Yes, fully — with true right-to-left layout across every screen, not just translated text.', ar:'نعم بالكامل — مع تخطيط حقيقي من اليمين لليسار في كل شاشة، وليس مجرد نص مترجم.'}},
+];
+
+class Component extends DCLogic {
+  state = { lang:'en', viewMode:'desktop', openFaqIdx:0, revealed:{} };
+
+  segTxtBtn(active) {
+    return {border:'none',background: active?'#264D59':'transparent',color: active?'#fff':'#57646B',borderRadius:'7px',padding:'5px 10px',cursor:'pointer'};
+  }
+
+  componentDidMount() {
+    this._observer = new IntersectionObserver((entries) => {
+      let changed = false;
+      const next = {...this.state.revealed};
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('data-reveal');
+          if (id && !next[id]) { next[id] = true; changed = true; }
+        }
+      });
+      if (changed) this.setState({revealed: next});
+    }, {threshold: 0.15});
+    setTimeout(() => {
+      document.querySelectorAll('[data-reveal]').forEach(el => this._observer.observe(el));
+    }, 50);
+  }
+  componentWillUnmount() {
+    if (this._observer) this._observer.disconnect();
+  }
+  revealStyle(id, extra) {
+    const shown = !!this.state.revealed[id];
+    return {opacity: shown?1:0, transform: shown?'translateY(0)':'translateY(22px)', transition:'opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1)', ...(extra||{})};
+  }
+
+  renderVals() {
+    const lang = this.state.lang;
+    const isAr = lang === 'ar';
+    const t = STR[lang];
+    const isDesktop = this.state.viewMode !== 'mobile';
+
+    const mockBranches = [
+      {name: isAr?'العليا — الرياض':'Olaya — Riyadh', pct:92},
+      {name: isAr?'الكورنيش — جدة':'Corniche — Jeddah', pct:78},
+      {name: isAr?'الدمام':'Dammam', pct:88},
+    ].map((b, i) => ({...b, chipStyle:{fontFamily:"'IBM Plex Mono',monospace",fontSize:'11px',fontWeight:700,color: b.pct>=85?'#1F5C54':'#A85A1E'}, rowAnim:`lpFade .5s cubic-bezier(.16,1,.3,1) ${0.4+i*0.1}s backwards`}));
+
+    const trustStats = [
+      {value:'128+', label: isAr?'مطعم على المنصة':'Restaurants onboard'},
+      {value:'600+', label: isAr?'فرع مُدار':'Branches managed'},
+      {value:'99.2%', label: isAr?'وقت تشغيل':'Uptime'},
+      {value:'14', label: isAr?'يومًا تجربة مجانية':'Day free trial'},
+    ].map((s, i) => ({...s, revealId:'stat-'+i, revealStyle: {textAlign:'center', ...this.revealStyle('stat-'+i, {transitionDelay: (i*0.08)+'s'})}}));
+
+    const features = FEATURES.map((f, i) => ({
+      icon: makeIcon(f.icon), iconBg:f.bg, iconColor:f.color, title:f.title[lang], desc:f.desc[lang], revealId:'feature-'+i,
+      revealStyle: {background:'var(--card)', border:'0.5px solid var(--border)', borderRadius:'18px', padding:'26px', cursor:'default', transitionProperty:'opacity, transform, box-shadow',
+        ...this.revealStyle('feature-'+i, {transitionDelay: (i*0.08)+'s'})},
+    }));
+    const pricingFeatures = [
+      isAr?'مديران لكل فرع مشمولان':'2 managers per branch included',
+      isAr?'قوائم مهام غير محدودة':'Unlimited checklists',
+      isAr?'سجلات سلامة غذاء تلقائية':'Automatic food-safety logs',
+      isAr?'لوحات تحكم مباشرة':'Real-time dashboards',
+      isAr?'دعم عربي وإنجليزي كامل':'Full Arabic & English support',
+    ];
+
+    const openFaqIdx = this.state.openFaqIdx;
+    const faqs = FAQS.map((f, i) => ({
+      question: f.q[lang], answer: f.a[lang], open: openFaqIdx === i,
+      toggle: () => this.setState({openFaqIdx: openFaqIdx === i ? null : i}),
+      chevronStyle: `transform:${openFaqIdx===i?'rotate(180deg)':'rotate(0deg)'};transition:transform .15s ease;`,
+      revealId:'faq-'+i,
+      revealStyle: {background:'var(--card)', border:'0.5px solid var(--border)', borderRadius:'14px', padding:'18px 20px', cursor:'pointer', transitionProperty:'opacity, transform, border-color',
+        ...this.revealStyle('faq-'+i, {transitionDelay: (i*0.05)+'s'})},
+    }));
+
+    return {
+      dir: isAr?'rtl':'ltr', t, isDesktop,
+      goEn: () => this.setState({lang:'en'}), goAr: () => this.setState({lang:'ar'}),
+      langEnBtn: this.segTxtBtn(!isAr), langArBtn: this.segTxtBtn(isAr),
+      sidePad: isDesktop ? '40px' : '20px',
+      heroPad: isDesktop ? '60px 40px' : '32px 20px',
+      heroDir: isDesktop ? 'row' : 'column',
+      heroTitleSize: isDesktop ? '52px' : '34px',
+      h2Size: isDesktop ? '34px' : '26px',
+      statsCols: isDesktop ? 'repeat(4,1fr)' : 'repeat(2,1fr)',
+      featuresCols: isDesktop ? 'repeat(3,1fr)' : '1fr',
+      mockBranches, trustStats, features, pricingFeatures, faqs,
+      pricingRevealStyle: `opacity:${this.state.revealed['pricing']?1:0};transform:${this.state.revealed['pricing']?'translateY(0) scale(1)':'translateY(16px) scale(.97)'};transition:opacity .5s ease, transform .5s ease;transition-property:opacity, transform, box-shadow;`,
+      ctaRevealStyle: `opacity:${this.state.revealed['cta']?1:0};transform:${this.state.revealed['cta']?'translateY(0)':'translateY(16px)'};transition:opacity .5s ease, transform .5s ease;`,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
