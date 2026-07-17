@@ -64,7 +64,7 @@ export function TasksPageClient({
       const fd = new FormData();
       fd.set("photo", photos[item.id]!);
       const upload = await uploadProofWithRetry(fd);
-      if (upload.url) {
+      if ("url" in upload) {
         photoUrl = upload.url;
       } else {
         setUploadError(upload.error ?? t("uploadFailed"));

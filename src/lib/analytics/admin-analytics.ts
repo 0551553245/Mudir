@@ -16,12 +16,12 @@ import type {
   AdminAnalyticsSummary,
   DailyCountPoint,
   DateRange,
-  DateRangePreset,
+  AdminDateRangePreset,
   SubscriptionBreakdown,
 } from "./types";
 
 export function parseAdminDateRange(
-  preset: DateRangePreset = "30d"
+  preset: AdminDateRangePreset = "30d"
 ): DateRange {
   const days = preset === "7d" ? 7 : preset === "90d" ? 90 : 30;
   const end = endOfDay(new Date());

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const format = searchParams.get("format") ?? "csv";
   const rangePreset = (
-    ["7d", "30d", "90d"].includes(searchParams.get("range") ?? "")
+    ["1d", "7d", "30d", "90d"].includes(searchParams.get("range") ?? "")
       ? searchParams.get("range")
       : "30d"
   ) as DateRangePreset;
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
   if (format === "pdf") {
     const pdfBytes = buildReportPdf(report, labels);
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,

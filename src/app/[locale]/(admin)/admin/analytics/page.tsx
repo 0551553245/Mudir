@@ -12,7 +12,7 @@ import {
   computeSubscriptionBreakdown,
   groupActivityByAction,
 } from "@/lib/analytics/admin-analytics";
-import type { DateRangePreset } from "@/lib/analytics/types";
+import type { AdminDateRangePreset } from "@/lib/analytics/types";
 import { formatSAR } from "@/lib/utils";
 import { AnalyticsFilters } from "./analytics-filters";
 
@@ -23,7 +23,7 @@ export default async function AdminAnalyticsPage({
 }) {
   const t = await getTranslations("analytics");
   const locale = await getLocale();
-  const rangeLabels: Record<DateRangePreset, string> = {
+  const rangeLabels: Record<AdminDateRangePreset, string> = {
     "7d": t("range7d"),
     "30d": t("range30d"),
     "90d": t("range90d"),
@@ -31,9 +31,9 @@ export default async function AdminAnalyticsPage({
   const params = await searchParams;
   const rangePreset = (["7d", "30d", "90d"].includes(params.range ?? "")
     ? params.range
-    : "30d") as DateRangePreset;
+    : "30d") as AdminDateRangePreset;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const range = parseAdminDateRange(rangePreset);
 
   const { data: restaurants } = await supabase

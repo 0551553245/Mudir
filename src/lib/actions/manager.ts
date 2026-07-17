@@ -74,7 +74,7 @@ export async function submitFoodSafetyReading(formData: FormData) {
       .eq("id", standard.restaurant_id)
       .single();
 
-    if (restaurant?.notify_food_safety_failure !== false) {
+    if (restaurant && restaurant.notify_food_safety_failure !== false) {
       await createNotification({
         restaurantId: standard.restaurant_id,
         userId: restaurant.owner_user_id,
@@ -94,7 +94,9 @@ export async function submitFoodSafetyReading(formData: FormData) {
   return { data, notified: false };
 }
 
-export async function uploadProof(file: FormData) {
+export async function uploadProof(
+  file: FormData
+): Promise<{ url: string } | { error: string }> {
   const supabase = await createClient();
   const photo = file.get("photo") as File;
   if (!photo) return { error: "No file" };
@@ -118,12 +120,15 @@ export async function uploadProof(file: FormData) {
 }
 
 /** Retry-aware upload with up to 3 attempts */
-export async function uploadProofWithRetry(file: FormData, attempts = 3) {
+export async function uploadProofWithRetry(
+  file: FormData,
+  attempts = 3
+): Promise<{ url: string } | { error: string }> {
   let lastError = "Upload failed";
   for (let i = 0; i < attempts; i++) {
     const result = await uploadProof(file);
-    if (result.url) return result;
-    lastError = result.error ?? lastError;
+    if ("url" in result && result.url) return { url: result.url };
+    lastError = "error" in result ? (result.error ?? lastError) : lastError;
     await new Promise((r) => setTimeout(r, 400 * (i + 1)));
   }
   return { error: lastError };

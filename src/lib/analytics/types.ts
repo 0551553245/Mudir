@@ -1,9 +1,12 @@
 export type DateRangePreset = "1d" | "7d" | "30d" | "90d";
 
+/** Admin analytics only supports multi-day windows. */
+export type AdminDateRangePreset = "7d" | "30d" | "90d";
+
 export interface DateRange {
   start: Date;
   end: Date;
-  preset: DateRangePreset;
+  preset: DateRangePreset | AdminDateRangePreset;
 }
 
 export interface DailyCompletionPoint {

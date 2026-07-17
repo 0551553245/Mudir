@@ -6,7 +6,7 @@ import {
   isBefore,
   subDays,
 } from "date-fns";
-import type { TaskFrequency } from "./supabase/types";
+import type { TaskFrequency } from "@/lib/supabase/types";
 
 const FREQUENCY_HOURS: Record<TaskFrequency, number> = {
   daily: 24,
