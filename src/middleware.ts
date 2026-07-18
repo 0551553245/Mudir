@@ -13,6 +13,8 @@ const PUBLIC_PATHS = [
   "/admin/login",
   "/owner/login",
   "/owner/register",
+  "/forgot-password",
+  "/reset-password",
   "/privacy-policy",
   "/terms-of-service",
   "/refund-policy",
@@ -24,6 +26,7 @@ const AUTH_PATHS = [
   "/admin/login",
   "/owner/login",
   "/owner/register",
+  "/forgot-password",
 ];
 
 function stripLocale(pathname: string): { locale: string; path: string } {
@@ -82,6 +85,8 @@ export async function middleware(request: NextRequest) {
 
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(p));
   const isAuthPage = AUTH_PATHS.some((p) => path === p);
+  const isVerify2fa = path === "/verify-2fa";
+  const isResetPassword = path === "/reset-password";
 
   if (!user && !isPublic && path !== "" && path !== "/") {
     const locale = pathname.split("/")[1] || routing.defaultLocale;
@@ -94,42 +99,59 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role) {
-      const locale = pathname.split("/")[1] || routing.defaultLocale;
-      const dashboard = ROLE_ROUTES[profile.role as UserRole];
-      const url = request.nextUrl.clone();
-      url.pathname = `/${locale}${dashboard}`;
-      return NextResponse.redirect(url);
-    }
+  if (!user && isVerify2fa) {
+    const locale = pathname.split("/")[1] || routing.defaultLocale;
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}/login`;
+    return NextResponse.redirect(url);
   }
 
-  if (user && !isPublic) {
+  if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, first_login_verified_at")
       .eq("id", user.id)
       .single();
 
-    const role = profile?.role as UserRole | undefined;
-    if (role) {
-      const allowedPrefix = ROLE_ROUTES[role];
-      if (
-        (path.startsWith("/owner") ||
-          path.startsWith("/manager") ||
-          path.startsWith("/admin")) &&
-        !path.startsWith(allowedPrefix)
-      ) {
-        const locale = pathname.split("/")[1] || routing.defaultLocale;
+    const needsFirstLogin2fa = Boolean(
+      profile && !profile.first_login_verified_at
+    );
+    const locale = pathname.split("/")[1] || routing.defaultLocale;
+
+    if (needsFirstLogin2fa && !isVerify2fa && !isResetPassword) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${locale}/verify-2fa`;
+      return NextResponse.redirect(url);
+    }
+
+    if (!needsFirstLogin2fa && isVerify2fa && profile?.role) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${locale}${ROLE_ROUTES[profile.role as UserRole]}`;
+      return NextResponse.redirect(url);
+    }
+
+    if (user && isAuthPage && !needsFirstLogin2fa) {
+      if (profile?.role) {
         const url = request.nextUrl.clone();
-        url.pathname = `/${locale}${allowedPrefix}`;
+        url.pathname = `/${locale}${ROLE_ROUTES[profile.role as UserRole]}`;
         return NextResponse.redirect(url);
+      }
+    }
+
+    if (user && !isPublic && !isVerify2fa && !isResetPassword) {
+      const role = profile?.role as UserRole | undefined;
+      if (role) {
+        const allowedPrefix = ROLE_ROUTES[role];
+        if (
+          (path.startsWith("/owner") ||
+            path.startsWith("/manager") ||
+            path.startsWith("/admin")) &&
+          !path.startsWith(allowedPrefix)
+        ) {
+          const url = request.nextUrl.clone();
+          url.pathname = `/${locale}${allowedPrefix}`;
+          return NextResponse.redirect(url);
+        }
       }
     }
   }

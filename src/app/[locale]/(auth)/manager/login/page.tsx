@@ -86,6 +86,15 @@ export default function ManagerLoginPage() {
           className="rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]"
         />
 
+        <div className="text-end">
+          <Link
+            href="/forgot-password"
+            className="font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] text-accent hover:underline"
+          >
+            {t("forgotPassword")}
+          </Link>
+        </div>
+
         {error ? (
           <p className="text-sm text-needs-attention">{error}</p>
         ) : null}

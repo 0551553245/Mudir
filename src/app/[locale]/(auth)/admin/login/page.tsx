@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Input, Button } from "@/components/ui";
 import { AuthShell } from "@/components/auth-shell";
@@ -97,6 +97,15 @@ export default function AdminLoginPage() {
           placeholder="••••••••"
           className="rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]"
         />
+
+        <div className="text-end">
+          <Link
+            href="/forgot-password"
+            className="font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] text-accent hover:underline"
+          >
+            {t("forgotPassword")}
+          </Link>
+        </div>
 
         {error ? (
           <p className="text-sm text-needs-attention">{error}</p>

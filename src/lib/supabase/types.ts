@@ -31,6 +31,8 @@ export interface Profile {
   digest_enabled: boolean;
   digest_frequency: "weekly" | "off";
   digest_last_sent_at: string | null;
+  /** Set after the one-time first-login email OTP succeeds. */
+  first_login_verified_at: string | null;
   created_at: string;
   updated_at: string;
 }

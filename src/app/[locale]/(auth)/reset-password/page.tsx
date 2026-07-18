@@ -3,71 +3,72 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Input, Button } from "@/components/ui";
 import { AuthShell } from "@/components/auth-shell";
+import { updatePassword } from "@/lib/actions/auth";
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const t = useTranslations("auth");
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    if (password !== confirm) {
+      setError(t("passwordMismatch"));
+      return;
+    }
 
-    if (authError) {
-      setError(t("invalidCredentials"));
+    setLoading(true);
+    const result = await updatePassword(password);
+
+    if (result.error) {
+      const map: Record<string, string> = {
+        passwordTooShort: t("passwordTooShort"),
+        sessionExpired: t("resetSessionExpired"),
+        updateFailed: t("resetFailed"),
+        sendFailed: t("twoFaSendFailed"),
+        emailNotConfigured: t("twoFaSendFailed"),
+      };
+      setError(map[result.error] ?? t("resetFailed"));
       setLoading(false);
       return;
     }
 
     router.refresh();
-    router.push("/");
+    router.push(result.redirectTo ?? "/login");
   }
 
   return (
-    <AuthShell title={t("loginTitle")} subtitle={t("loginSubtitle")}>
+    <AuthShell title={t("resetTitle")} subtitle={t("resetSubtitle")}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
         <Input
-          label={t("email")}
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-          placeholder="you@restaurant.com"
-          className="rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]"
-        />
-        <Input
-          label={t("password")}
+          label={t("newPassword")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          autoComplete="current-password"
+          minLength={8}
+          autoComplete="new-password"
           placeholder="••••••••"
           className="rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]"
         />
-
-        <div className="text-end">
-          <Link
-            href="/forgot-password"
-            className="font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] text-accent hover:underline"
-          >
-            {t("forgotPassword")}
-          </Link>
-        </div>
+        <Input
+          label={t("confirmPassword")}
+          type="password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          placeholder="••••••••"
+          className="rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]"
+        />
 
         {error ? (
           <p className="text-sm text-needs-attention">{error}</p>
@@ -78,25 +79,15 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full rounded-[10px] bg-accent py-[13px] text-[14.5px] font-semibold text-white hover:bg-accent-hover"
         >
-          {loading ? "…" : t("login")}
+          {loading ? "…" : t("resetSubmit")}
         </Button>
 
         <p className="text-center text-[13px] text-ink-soft">
-          {t("noAccount")}{" "}
           <Link
-            href="/signup"
+            href="/login"
             className="font-semibold text-accent hover:underline"
           >
-            {t("signup")}
-          </Link>
-        </p>
-
-        <p className="text-center text-xs text-ink-faint">
-          <Link
-            href="/manager/login"
-            className="font-semibold text-ink-soft hover:text-deep-palm"
-          >
-            {t("managerLoginLink")}
+            {t("backToLogin")}
           </Link>
         </p>
       </form>
