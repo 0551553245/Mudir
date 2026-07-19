@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (result.enterprise) {
+    if ("enterprise" in result && result.enterprise) {
       return NextResponse.redirect(
         `${appUrl}/${locale}/owner/billing?enterprise=1`
       );
