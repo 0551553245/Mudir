@@ -283,100 +283,20 @@ export function TasksClient({
           setEditing(null);
         }}
         title={editing ? t("editTask") : t("addTask")}
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            name="title"
-            label={t("taskTitle")}
-            defaultValue={editing?.title ?? ""}
-            required
-          />
-          <Input
-            name="title_ar"
-            label={`${t("taskTitle")} (AR)`}
-            defaultValue={editing?.title_ar ?? ""}
-          />
-          <Select
-            name="category"
-            label={t("taskCategory")}
-            defaultValue={editing?.category ?? "custom"}
-            options={TASK_CATEGORIES.map((c) => ({
-              value: c,
-              label: cat(c),
-            }))}
-          />
-          <Select
-            name="frequency"
-            label={t("frequency")}
-            defaultValue={editing?.frequency ?? "daily"}
-            options={[
-              { value: "daily", label: tf("daily") },
-              { value: "weekly", label: tf("weekly") },
-              { value: "monthly", label: tf("monthly") },
-            ]}
-          />
-          <Select
-            name="branch_id"
-            label={tc("branch")}
-            defaultValue={editing?.branch_id ?? ""}
-            options={[
-              { value: "", label: tc("allBranches") },
-              ...branches.map((b) => ({ value: b.id, label: b.name })),
-            ]}
-          />
-          <div className="space-y-3">
-            <p className="label-mono">{t("addItem")}</p>
-            {items.map((item, i) => (
-              <div key={i} className="space-y-2 rounded-md border border-border p-3">
-                <Input
-                  label={t("itemLabel")}
-                  value={item.label}
-                  onChange={(e) => {
-                    const next = [...items];
-                    next[i] = { ...next[i], label: e.target.value };
-                    setItems(next);
-                  }}
-                />
-                <div className="flex flex-wrap gap-4 text-sm">
-                  {(
-                    [
-                      ["requires_photo", t("requiresPhoto")],
-                      ["requires_note", t("requiresNote")],
-                      ["requires_number", t("requiresNumber")],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <label key={key} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={item[key]}
-                        onChange={(e) => {
-                          const next = [...items];
-                          next[i] = { ...next[i], [key]: e.target.checked };
-                          setItems(next);
-                        }}
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
+        footer={
+          <div className="flex items-center gap-2">
             <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setItems([...items, emptyItem()])}
+              type="submit"
+              form="checklist-form"
+              disabled={loading}
+              className="!px-4 !py-2 text-sm"
             >
-              {t("addItem")}
-            </Button>
-          </div>
-          {error && <p className="text-sm text-needs-attention">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>
               {editing ? tc("save") : tc("create")}
             </Button>
             <Button
               type="button"
               variant="secondary"
+              className="!px-4 !py-2 text-sm"
               onClick={() => {
                 setOpen(false);
                 setEditing(null);
@@ -384,6 +304,130 @@ export function TasksClient({
             >
               {tc("cancel")}
             </Button>
+            {error ? (
+              <p className="ms-auto text-xs text-needs-attention">{error}</p>
+            ) : null}
+          </div>
+        }
+      >
+        <form
+          id="checklist-form"
+          onSubmit={handleSubmit}
+          className="space-y-2.5 [&_.input-field]:!py-1.5 [&_.input-field]:!px-2.5 [&_.space-y-1\.5]:space-y-1"
+        >
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Input
+              name="title"
+              label={t("taskTitle")}
+              defaultValue={editing?.title ?? ""}
+              required
+            />
+            <Input
+              name="title_ar"
+              label={`${t("taskTitle")} (AR)`}
+              defaultValue={editing?.title_ar ?? ""}
+            />
+          </div>
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            <Select
+              name="category"
+              label={t("taskCategory")}
+              defaultValue={editing?.category ?? "custom"}
+              options={TASK_CATEGORIES.map((c) => ({
+                value: c,
+                label: cat(c),
+              }))}
+            />
+            <Select
+              name="frequency"
+              label={t("frequency")}
+              defaultValue={editing?.frequency ?? "daily"}
+              options={[
+                { value: "daily", label: tf("daily") },
+                { value: "weekly", label: tf("weekly") },
+                { value: "monthly", label: tf("monthly") },
+              ]}
+            />
+            <Select
+              name="branch_id"
+              label={tc("branch")}
+              defaultValue={editing?.branch_id ?? ""}
+              options={[
+                { value: "", label: tc("allBranches") },
+                ...branches.map((b) => ({ value: b.id, label: b.name })),
+              ]}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="label-mono">{t("addItem")}</p>
+              <Button
+                type="button"
+                variant="secondary"
+                className="!px-2.5 !py-1 text-xs"
+                onClick={() => setItems([...items, emptyItem()])}
+              >
+                + {t("addItem")}
+              </Button>
+            </div>
+            <div className="max-h-[min(28vh,220px)] space-y-1.5 overflow-y-auto overscroll-contain pe-0.5">
+              {items.map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-md border border-border px-2 py-1.5"
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      className="input-field !py-1.5 !px-2.5"
+                      placeholder={t("itemLabel")}
+                      value={item.label}
+                      onChange={(e) => {
+                        const next = [...items];
+                        next[i] = { ...next[i], label: e.target.value };
+                        setItems(next);
+                      }}
+                    />
+                    {items.length > 1 ? (
+                      <button
+                        type="button"
+                        className="shrink-0 px-1 text-ink-faint hover:text-needs-attention"
+                        aria-label={tc("delete")}
+                        onClick={() =>
+                          setItems(items.filter((_, idx) => idx !== i))
+                        }
+                      >
+                        ✕
+                      </button>
+                    ) : null}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
+                    {(
+                      [
+                        ["requires_photo", t("requiresPhoto")],
+                        ["requires_note", t("requiresNote")],
+                        ["requires_number", t("requiresNumber")],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          checked={item[key]}
+                          onChange={(e) => {
+                            const next = [...items];
+                            next[i] = {
+                              ...next[i],
+                              [key]: e.target.checked,
+                            };
+                            setItems(next);
+                          }}
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </form>
       </Modal>

@@ -87,21 +87,36 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
+  size?: "md" | "lg";
 }
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  footer,
+  size = "md",
+}: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-ink/20"
         onClick={onClose}
         aria-hidden
       />
-      <div className="panel-block relative z-10 my-auto flex w-full max-w-lg max-h-[min(90dvh,900px)] flex-col overflow-hidden">
-        <div className="panel-header shrink-0">
-          <h2 className="text-lg">{title}</h2>
+      <div
+        className={cn(
+          "panel-block relative z-10 flex w-full flex-col overflow-hidden",
+          "max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2rem)]",
+          size === "lg" ? "max-w-xl" : "max-w-lg"
+        )}
+      >
+        <div className="panel-header shrink-0 !py-2.5 !px-3.5">
+          <h2 className="text-base">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -111,9 +126,14 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             ✕
           </button>
         </div>
-        <div className="panel-body min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="panel-body min-h-0 flex-1 overflow-y-auto overscroll-contain !px-3.5 !py-3">
           {children}
         </div>
+        {footer ? (
+          <div className="shrink-0 border-t border-divider bg-card px-3.5 py-2.5">
+            {footer}
+          </div>
+        ) : null}
       </div>
     </div>
   );
