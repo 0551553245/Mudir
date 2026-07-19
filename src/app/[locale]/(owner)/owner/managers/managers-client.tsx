@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createManager, deleteManager } from "@/lib/actions/owner";
-import { Button, Input, Select, Modal, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import type { Branch } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
@@ -100,11 +100,31 @@ export function ManagersClient({
         )}
       </PanelBlock>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("addManager")}>
-        <form onSubmit={handleCreate} className="space-y-4">
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("addManager")}
+        footer={
+          <ModalActions
+            formId="manager-form"
+            loading={loading}
+            onCancel={() => setOpen(false)}
+            submitLabel={tc("create")}
+            cancelLabel={tc("cancel")}
+            error={error || undefined}
+          />
+        }
+      >
+        <form
+          id="manager-form"
+          onSubmit={handleCreate}
+          className={modalFormClassName}
+        >
           <Input name="full_name" label={tc("required")} required />
-          <Input name="email" type="email" label="Email" required />
-          <Input name="password" type="password" label="Password" required minLength={8} />
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Input name="email" type="email" label="Email" required />
+            <Input name="password" type="password" label="Password" required minLength={8} />
+          </div>
           <Select
             name="branch_id"
             label={t("assignBranch")}
@@ -116,13 +136,6 @@ export function ManagersClient({
                 label: `${b.name} (${branchManagerCounts[b.id] ?? 0}/${MAX_MANAGERS_PER_BRANCH})`,
               }))}
           />
-          {error && <p className="text-sm text-needs-attention">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>{tc("create")}</Button>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              {tc("cancel")}
-            </Button>
-          </div>
         </form>
       </Modal>
     </div>

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createFoodSafetyStandard } from "@/lib/actions/owner";
 import { acknowledgeReading } from "@/lib/actions/settings";
-import { Button, Input, Select, Modal, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import { useOptionalBranchContext } from "@/components/branch-context";
 import { cn } from "@/lib/utils";
@@ -272,10 +272,30 @@ export function FoodSafetyClient({
         </PanelBlock>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("addStandard")}>
-        <form onSubmit={handleCreate} className="space-y-4">
-          <Input name="name" label={t("standardName")} required />
-          <Input name="name_ar" label={`${t("standardName")} (AR)`} />
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("addStandard")}
+        footer={
+          <ModalActions
+            formId="standard-form"
+            loading={loading}
+            onCancel={() => setOpen(false)}
+            submitLabel={tc("create")}
+            cancelLabel={tc("cancel")}
+            error={error || undefined}
+          />
+        }
+      >
+        <form
+          id="standard-form"
+          onSubmit={handleCreate}
+          className={modalFormClassName}
+        >
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Input name="name" label={t("standardName")} required />
+            <Input name="name_ar" label={`${t("standardName")} (AR)`} />
+          </div>
           <Select
             name="range_type_display"
             label={t("rangeType")}
@@ -287,7 +307,7 @@ export function FoodSafetyClient({
               { value: "min_max", label: tr("min_max") },
             ]}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2.5">
             {(rangeType === "min_only" || rangeType === "min_max") && (
               <Input name="min_value" type="number" step="any" label={t("minValue")} required />
             )}
@@ -295,30 +315,25 @@ export function FoodSafetyClient({
               <Input name="max_value" type="number" step="any" label={t("maxValue")} required />
             )}
           </div>
-          <Input name="unit" label={t("unit")} defaultValue="°C" required />
-          <Select
-            name="check_frequency"
-            label={t("checkFrequency")}
-            options={[
-              { value: "daily", label: "Daily" },
-              { value: "weekly", label: "Weekly" },
-              { value: "monthly", label: "Monthly" },
-            ]}
-          />
-          <Select
-            name="branch_id"
-            label={tc("branch")}
-            options={[
-              { value: "", label: tc("allBranches") },
-              ...branches.map((b) => ({ value: b.id, label: b.name })),
-            ]}
-          />
-          {error && <p className="text-sm text-needs-attention">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>{tc("create")}</Button>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              {tc("cancel")}
-            </Button>
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            <Input name="unit" label={t("unit")} defaultValue="°C" required />
+            <Select
+              name="check_frequency"
+              label={t("checkFrequency")}
+              options={[
+                { value: "daily", label: "Daily" },
+                { value: "weekly", label: "Weekly" },
+                { value: "monthly", label: "Monthly" },
+              ]}
+            />
+            <Select
+              name="branch_id"
+              label={tc("branch")}
+              options={[
+                { value: "", label: tc("allBranches") },
+                ...branches.map((b) => ({ value: b.id, label: b.name })),
+              ]}
+            />
           </div>
         </form>
       </Modal>

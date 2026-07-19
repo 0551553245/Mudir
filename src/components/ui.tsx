@@ -82,6 +82,52 @@ export function Button({
   );
 }
 
+export function ModalActions({
+  formId,
+  loading,
+  onCancel,
+  submitLabel,
+  cancelLabel,
+  error,
+}: {
+  formId: string;
+  loading?: boolean;
+  onCancel: () => void;
+  submitLabel: string;
+  cancelLabel: string;
+  error?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        type="submit"
+        form={formId}
+        disabled={loading}
+        className="!px-4 !py-2 text-sm"
+      >
+        {submitLabel}
+      </Button>
+      <Button
+        type="button"
+        variant="secondary"
+        className="!px-4 !py-2 text-sm"
+        onClick={onCancel}
+      >
+        {cancelLabel}
+      </Button>
+      {error ? (
+        <p className="ms-auto max-w-[40%] truncate text-xs text-needs-attention">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Compact field spacing for tall create/edit forms inside Modal. */
+export const modalFormClassName =
+  "space-y-2.5 [&_.input-field]:!py-1.5 [&_.input-field]:!px-2.5 [&_.space-y-1\\.5]:space-y-1 [&_textarea.input-field]:min-h-[72px]";
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;

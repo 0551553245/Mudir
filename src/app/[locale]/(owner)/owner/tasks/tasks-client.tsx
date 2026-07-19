@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createTask, updateTask, deleteTask } from "@/lib/actions/owner";
-import { Button, Input, Select, Modal, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import { useOptionalBranchContext } from "@/components/branch-context";
 import { getItemStatus } from "@/lib/tasks/period";
@@ -284,36 +284,23 @@ export function TasksClient({
         }}
         title={editing ? t("editTask") : t("addTask")}
         footer={
-          <div className="flex items-center gap-2">
-            <Button
-              type="submit"
-              form="checklist-form"
-              disabled={loading}
-              className="!px-4 !py-2 text-sm"
-            >
-              {editing ? tc("save") : tc("create")}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              className="!px-4 !py-2 text-sm"
-              onClick={() => {
-                setOpen(false);
-                setEditing(null);
-              }}
-            >
-              {tc("cancel")}
-            </Button>
-            {error ? (
-              <p className="ms-auto text-xs text-needs-attention">{error}</p>
-            ) : null}
-          </div>
+          <ModalActions
+            formId="checklist-form"
+            loading={loading}
+            onCancel={() => {
+              setOpen(false);
+              setEditing(null);
+            }}
+            submitLabel={editing ? tc("save") : tc("create")}
+            cancelLabel={tc("cancel")}
+            error={error || undefined}
+          />
         }
       >
         <form
           id="checklist-form"
           onSubmit={handleSubmit}
-          className="space-y-2.5 [&_.input-field]:!py-1.5 [&_.input-field]:!px-2.5 [&_.space-y-1\.5]:space-y-1"
+          className={modalFormClassName}
         >
           <div className="grid gap-2.5 sm:grid-cols-2">
             <Input

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createScheduleEvent } from "@/lib/actions/owner";
-import { Button, Input, Select, Textarea, Modal, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Select, Textarea, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import type { Branch, ScheduleEvent } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
@@ -72,35 +72,52 @@ export function ScheduleClient({
         )}
       </PanelBlock>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("addEvent")}>
-        <form onSubmit={handleCreate} className="space-y-4">
-          <Input name="title" label={t("eventTitle")} required />
-          <Input name="title_ar" label={`${t("eventTitle")} (AR)`} />
-          <Select
-            name="type"
-            label={t("eventType")}
-            options={[
-              { value: "training", label: te("training") },
-              { value: "inspection", label: te("inspection") },
-              { value: "audit", label: te("audit") },
-              { value: "other", label: te("other") },
-            ]}
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("addEvent")}
+        footer={
+          <ModalActions
+            formId="event-form"
+            loading={loading}
+            onCancel={() => setOpen(false)}
+            submitLabel={tc("create")}
+            cancelLabel={tc("cancel")}
+            error={error || undefined}
           />
-          <Input name="event_date" type="date" label={t("eventDate")} required />
-          <Select
-            name="branch_id"
-            label={tc("branch")}
-            options={[
-              { value: "", label: tc("allBranches") },
-              ...branches.map((b) => ({ value: b.id, label: b.name })),
-            ]}
-          />
-          <Textarea name="description" label={tc("optional")} />
-          {error && <p className="text-sm text-needs-attention">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>{tc("create")}</Button>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>{tc("cancel")}</Button>
+        }
+      >
+        <form
+          id="event-form"
+          onSubmit={handleCreate}
+          className={modalFormClassName}
+        >
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Input name="title" label={t("eventTitle")} required />
+            <Input name="title_ar" label={`${t("eventTitle")} (AR)`} />
           </div>
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            <Select
+              name="type"
+              label={t("eventType")}
+              options={[
+                { value: "training", label: te("training") },
+                { value: "inspection", label: te("inspection") },
+                { value: "audit", label: te("audit") },
+                { value: "other", label: te("other") },
+              ]}
+            />
+            <Input name="event_date" type="date" label={t("eventDate")} required />
+            <Select
+              name="branch_id"
+              label={tc("branch")}
+              options={[
+                { value: "", label: tc("allBranches") },
+                ...branches.map((b) => ({ value: b.id, label: b.name })),
+              ]}
+            />
+          </div>
+          <Textarea name="description" label={tc("optional")} />
         </form>
       </Modal>
     </div>

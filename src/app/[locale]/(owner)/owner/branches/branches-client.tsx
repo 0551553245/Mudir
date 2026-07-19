@@ -5,7 +5,7 @@ import Script from "next/script";
 import { useTranslations, useLocale } from "next-intl";
 import { createBranch, deleteBranch } from "@/lib/actions/owner";
 import { purchaseAdditionalBranchSlot } from "@/lib/actions/billing";
-import { Button, Input, Modal, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import type { Branch } from "@/lib/supabase/types";
 import { PRICE_PER_BRANCH_SAR } from "@/lib/supabase/types";
@@ -217,23 +217,28 @@ export function BranchesClient({
         )}
       </PanelBlock>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("addBranch")}>
-        <form onSubmit={handleCreate} className="space-y-4">
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("addBranch")}
+        footer={
+          <ModalActions
+            formId="branch-form"
+            loading={loading}
+            onCancel={() => setOpen(false)}
+            submitLabel={tc("create")}
+            cancelLabel={tc("cancel")}
+            error={error || undefined}
+          />
+        }
+      >
+        <form
+          id="branch-form"
+          onSubmit={handleCreate}
+          className={modalFormClassName}
+        >
           <Input name="name" label={t("branchName")} required />
           <Input name="address" label={t("branchAddress")} />
-          {error && <p className="text-sm text-needs-attention">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>
-              {tc("create")}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setOpen(false)}
-            >
-              {tc("cancel")}
-            </Button>
-          </div>
         </form>
       </Modal>
 
