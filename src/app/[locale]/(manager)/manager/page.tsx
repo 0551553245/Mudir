@@ -4,34 +4,47 @@ import { getManagerContext, getProfile } from "@/lib/supabase/auth";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/components/metric-card";
 import { ManagerDashboardClient } from "./dashboard-client";
+import {
+  MgrCard,
+  MgrCardHeader,
+  ProgressRing,
+  EventTypeBadge,
+} from "@/components/manager-ui";
 import { getItemStatus } from "@/lib/tasks/period";
 import type { TaskFrequency } from "@/lib/supabase/types";
+import { startOfDay } from "date-fns";
 
 function tierColor(pct: number) {
-  if (pct >= 85) return { solid: "#43978D", bg: "#EAF4F2", ink: "#1F5C54" };
-  if (pct >= 70) return { solid: "#264D59", bg: "#E7EDEF", ink: "#17323A" };
-  if (pct >= 50) return { solid: "#F9E07F", bg: "#FFFBEA", ink: "#8A6D1D" };
-  if (pct >= 30) return { solid: "#F9AD6A", bg: "#FFF3E6", ink: "#A85A1E" };
-  return { solid: "#D46C4E", bg: "#FBEAE4", ink: "#9C3F26" };
+  if (pct >= 85) return "#37B788";
+  if (pct >= 70) return "#43978D";
+  if (pct >= 50) return "#E0A23B";
+  if (pct >= 30) return "#F9AD6A";
+  return "#E8697C";
 }
 
-function formatEventDay(dateStr: string) {
+function formatEventDay(dateStr: string, locale: string) {
   const d = new Date(`${dateStr}T12:00:00`);
   if (Number.isNaN(d.getTime())) return dateStr.slice(0, 6);
-  return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric" });
+  return d.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", {
+    weekday: "short",
+    day: "numeric",
+  });
 }
 
 export default async function ManagerDashboardPage() {
   const t = await getTranslations("manager");
   const tf = await getTranslations("frequency");
   const te = await getTranslations("empty");
+  const tet = await getTranslations("eventTypes");
   const locale = await getLocale();
   const context = await getManagerContext();
   if (!context) return null;
 
   const profile = await getProfile();
-  const branch = context.branches as { id: string; name: string };
+  const branch = context.branches as { id: string; name: string; address: string | null };
   const supabase = await createClient();
+  const today = new Date().toISOString().split("T")[0];
+  const todayStart = startOfDay(new Date());
 
   const { data: tasks } = await supabase
     .from("tasks")
@@ -51,9 +64,22 @@ export default async function ManagerDashboardPage() {
     .select("*")
     .eq("restaurant_id", context.restaurant_id)
     .or(`branch_id.is.null,branch_id.eq.${branch.id}`)
-    .gte("event_date", new Date().toISOString().split("T")[0])
+    .gte("event_date", today)
     .order("event_date")
     .limit(2);
+
+  const { data: standards } = await supabase
+    .from("food_safety_standards")
+    .select("*")
+    .eq("restaurant_id", context.restaurant_id)
+    .eq("is_active", true)
+    .or(`branch_id.is.null,branch_id.eq.${branch.id}`);
+
+  const { data: readings } = await supabase
+    .from("food_safety_readings")
+    .select("*")
+    .eq("branch_id", branch.id)
+    .gte("submitted_at", todayStart.toISOString());
 
   let done = 0;
   let total = 0;
@@ -91,175 +117,163 @@ export default async function ManagerDashboardPage() {
   });
 
   const completionPct = total === 0 ? 0 : Math.round((done / total) * 100);
-  const shiftTier = tierColor(completionPct);
-  const circumference = 2 * Math.PI * 36;
-  const dash = `${((completionPct / 100) * circumference).toFixed(1)} ${circumference}`;
   const nextEvent = events?.[0] ?? null;
   const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? "";
 
+  let fsPass = 0;
+  let fsFail = 0;
+  let fsPending = 0;
+  for (const s of standards ?? []) {
+    const reading = (readings ?? []).find((r) => r.standard_id === s.id);
+    if (!reading) fsPending++;
+    else if (reading.passed) fsPass++;
+    else fsFail++;
+  }
+  const fsTotal = (standards ?? []).length;
+  const fsPassPct = fsTotal === 0 ? 0 : Math.round((fsPass / fsTotal) * 100);
+
   return (
-    <div className="relative flex flex-col gap-[18px] animate-[mgrFade_0.25s_ease]">
+    <div className="relative flex flex-col gap-4 animate-[mgrFade_0.25s_ease]">
       <ManagerDashboardClient branchId={branch.id} />
 
       <div>
-        <h1 className="font-[family-name:var(--font-outfit)] text-[26px] font-medium text-deep-palm">
+        <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
           {firstName
             ? t("greeting", { name: firstName })
             : t("dashboardTitle")}
         </h1>
         <p className="mt-1 text-sm text-ink-soft">{t("dashboardSubtitle")}</p>
-        <p className="mt-1 font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] text-ink-faint">
-          {t("yourBranch")}: {branch.name}
-        </p>
       </div>
 
-      <section className="flex flex-wrap items-center gap-5 rounded-[18px] border border-border bg-card p-5">
-        <div className="relative h-[84px] w-[84px] shrink-0">
-          <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden>
-            <circle
-              cx="42"
-              cy="42"
-              r="36"
-              fill="none"
-              stroke="var(--border)"
-              strokeWidth="8"
-            />
-            <circle
-              cx="42"
-              cy="42"
-              r="36"
-              fill="none"
-              stroke={shiftTier.solid}
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={dash}
-              transform="rotate(-90 42 42)"
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-outfit)] text-[19px] font-semibold text-deep-palm">
-            {completionPct}%
-          </div>
-        </div>
+      <MgrCard className="flex flex-wrap items-center gap-5">
+        <ProgressRing
+          pct={completionPct}
+          color={tierColor(completionPct)}
+          label={`${completionPct}%`}
+        />
         <div className="min-w-[180px] flex-1">
-          <div className="font-[family-name:var(--font-outfit)] text-[17px] font-semibold text-ink">
+          <div className="text-[17px] font-semibold text-ink">
             {t("shiftProgress")}
           </div>
           <div className="mt-1 text-[13px] text-ink-soft">
             {done}/{total} {t("itemsComplete")}
           </div>
+          <div className="mt-1 text-[12.5px] text-ink-faint">
+            {t("shiftEnds", { time: "22:00" })}
+          </div>
           {total > 0 && done === total ? (
-            <div className="mt-1.5 font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] text-accent">
+            <div className="mt-1.5 text-[12px] font-semibold text-on-track">
               {t("allCaughtUp")}
             </div>
           ) : null}
         </div>
-      </section>
+      </MgrCard>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[18px] border border-border bg-card p-[18px]">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h3 className="font-[family-name:var(--font-outfit)] text-base font-medium text-ink">
-              {t("todaysTasks")}
-            </h3>
-            <Link
-              href="/manager/tasks"
-              className="font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-semibold text-accent hover:underline"
-            >
-              {t("viewAll")} →
-            </Link>
-          </div>
+        <MgrCard>
+          <MgrCardHeader
+            title={t("todaysTasks")}
+            href="/manager/tasks"
+            linkLabel={t("viewAll")}
+          />
           {taskSummaries.length === 0 ? (
             <EmptyState title={te("noTasks")} />
           ) : (
-            <div className="flex flex-col">
-              {taskSummaries.slice(0, 5).map((ts) => {
-                const tier = tierColor(ts.pct);
-                return (
-                  <Link
-                    key={ts.id}
-                    href="/manager/tasks"
-                    className="flex items-center justify-between gap-2.5 border-b border-border py-2.5 last:border-0"
-                  >
-                    <div className="min-w-0">
-                      <div className="truncate text-[13.5px] font-semibold text-ink">
-                        {ts.title}
-                      </div>
-                      <div className="mt-0.5 text-[11.5px] text-ink-faint">
-                        {ts.freq}
-                      </div>
-                    </div>
-                    <span
-                      className="shrink-0 rounded-full px-2.5 py-1 font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-bold"
-                      style={{ background: tier.bg, color: tier.ink }}
-                    >
+            <div className="flex flex-col gap-3.5">
+              {taskSummaries.slice(0, 5).map((ts) => (
+                <Link key={ts.id} href="/manager/tasks" className="block">
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
+                    <span className="truncate text-[13.5px] font-semibold text-ink">
+                      {ts.title}
+                    </span>
+                    <span className="shrink-0 text-[12px] tabular-nums text-ink-faint">
                       {ts.doneCount}/{ts.totalCount}
                     </span>
-                  </Link>
-                );
-              })}
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-white/80">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${ts.pct}%`,
+                        backgroundColor: tierColor(ts.pct),
+                      }}
+                    />
+                  </div>
+                </Link>
+              ))}
             </div>
           )}
-        </section>
+        </MgrCard>
 
-        <section className="rounded-[18px] border border-border bg-card p-[18px]">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h3 className="font-[family-name:var(--font-outfit)] text-base font-medium text-ink">
-              {t("foodDue")}
-            </h3>
-            <Link
-              href="/manager/food-safety"
-              className="font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-semibold text-accent hover:underline"
-            >
-              {t("viewAll")} →
-            </Link>
-          </div>
-          <Link
+        <MgrCard>
+          <MgrCardHeader
+            title={t("foodDue")}
             href="/manager/food-safety"
-            className="flex items-center justify-between gap-2.5 border-b border-border py-2.5"
-          >
-            <div className="min-w-0">
-              <div className="text-[13.5px] font-semibold text-ink">
-                {t("foodSafetyTitle")}
-              </div>
-              <div className="mt-0.5 text-[11.5px] text-ink-faint">
-                {t("foodSafetySubtitle")}
-              </div>
+            linkLabel={t("viewAll")}
+          />
+          {fsTotal === 0 ? (
+            <EmptyState title={te("noReadingsDue")} />
+          ) : (
+            <div className="flex flex-wrap items-center gap-5">
+              <ProgressRing
+                pct={fsPassPct || (fsPending === fsTotal ? 8 : fsPassPct)}
+                size={96}
+                stroke={10}
+                color={
+                  fsFail > 0
+                    ? "#E8697C"
+                    : fsPending > 0
+                      ? "#E0A23B"
+                      : "#37B788"
+                }
+                label={`${fsPass}/${fsTotal}`}
+                sublabel="PASS"
+              />
+              <ul className="space-y-2 text-[13px] text-ink-soft">
+                <li className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#37B788]" />
+                  {t("fsPass")}: {fsPass}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#E8697C]" />
+                  {t("fsFail")}: {fsFail}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#E0A23B]" />
+                  {t("fsPending")}: {fsPending}
+                </li>
+              </ul>
             </div>
-            <span className="shrink-0 rounded-full bg-[#FFF3E6] px-2.5 py-1 font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-bold text-[#A85A1E]">
-              {t("foodPending")}
-            </span>
-          </Link>
-        </section>
+          )}
+        </MgrCard>
       </div>
 
-      <Link
-        href="/manager/schedule"
-        className="block rounded-[18px] border border-border bg-card p-[18px] transition-colors hover:border-accent/40"
-      >
-        <div className="mb-2.5 flex items-center justify-between gap-2">
-          <h3 className="font-[family-name:var(--font-outfit)] text-base font-medium text-ink">
-            {t("nextEvent")}
-          </h3>
-          <span className="font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-semibold text-accent">
-            {t("viewSchedule")} →
-          </span>
-        </div>
+      <MgrCard>
+        <MgrCardHeader
+          title={t("nextEvent")}
+          href="/manager/schedule"
+          linkLabel={t("viewSchedule")}
+        />
         {nextEvent ? (
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="rounded-md bg-[#EAF4F2] px-2 py-0.5 font-[family-name:var(--font-ibm-plex-mono)] text-[10.5px] font-bold uppercase text-[#1F5C54]">
-              {formatEventDay(nextEvent.event_date)}
-            </span>
-            <span className="font-[family-name:var(--font-outfit)] text-[14.5px] font-semibold text-ink">
-              {nextEvent.title}
+            <EventTypeBadge
+              type={nextEvent.type}
+              label={tet(nextEvent.type)}
+            />
+            <span className="text-[14.5px] font-semibold text-ink">
+              {locale === "ar" && nextEvent.title_ar
+                ? nextEvent.title_ar
+                : nextEvent.title}
             </span>
             <span className="text-[12.5px] text-ink-faint">
-              {nextEvent.event_date}
+              {formatEventDay(nextEvent.event_date, locale)}
+              {nextEvent.description ? ` · ${nextEvent.description}` : ""}
             </span>
           </div>
         ) : (
           <p className="text-[13px] text-ink-faint">{te("noUpcomingEvents")}</p>
         )}
-      </Link>
+      </MgrCard>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { RoleTag } from "./role-tag";
 import { BranchSwitcher } from "./branch-switcher";
 import { NotificationsBell } from "./notifications-bell";
+import { MudirMark } from "./mudir-logo";
 import type { UserRole } from "@/lib/supabase/types";
 import { createClient } from "@/lib/supabase/client";
 import { localeNames, type Locale } from "@/i18n/config";
@@ -35,6 +36,11 @@ interface AppShellProps {
   restaurantId?: string;
   showBranchSwitcher?: boolean;
   mobileBottomNav?: React.ReactNode;
+  /** Manager sidebar footer: branch display name */
+  branchLabel?: string;
+  /** Header avatar initials */
+  userInitials?: string;
+  profileHref?: string;
 }
 
 const NAV_ICONS: Record<string, LucideIcon> = {
@@ -73,6 +79,9 @@ export function AppShell({
   restaurantId,
   showBranchSwitcher = false,
   mobileBottomNav,
+  branchLabel,
+  userInitials,
+  profileHref,
 }: AppShellProps) {
   const t = useTranslations();
   const pathname = usePathname();
@@ -103,10 +112,10 @@ export function AppShell({
       <aside className="fixed inset-y-0 start-0 z-40 hidden w-[236px] flex-col border-e border-border bg-card md:flex">
         <div className="flex items-center gap-2.5 px-5 pb-2 pt-6">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-accent font-[family-name:var(--font-outfit)] text-base font-semibold text-white">
-              S
+            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-forest">
+              <MudirMark size={20} variant="lime" />
             </span>
-            <span className="font-[family-name:var(--font-outfit)] text-[19px] font-semibold text-deep-palm">
+            <span className="font-[family-name:var(--font-baloo)] text-[19px] font-bold text-forest">
               {t("common.appName")}
             </span>
           </Link>
@@ -139,16 +148,36 @@ export function AppShell({
               </span>
             </p>
           ) : null}
-          <div className="flex items-center gap-3 rounded-[10px] bg-bg px-3 py-2.5">
-            <RoleTag role={role} />
+          {role === "manager" && branchLabel ? (
+            <div className="mb-3 px-1">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
+                {t("manager.yourBranch")}
+              </p>
+              <p className="mt-0.5 text-[13.5px] font-bold text-ink">
+                {branchLabel}
+              </p>
+            </div>
+          ) : null}
+          {role !== "manager" ? (
+            <div className="flex items-center gap-3 rounded-[10px] bg-bg px-3 py-2.5">
+              <RoleTag role={role} />
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="ms-auto text-[12.5px] font-semibold text-ink-soft hover:text-deep-palm"
+              >
+                {t("common.signOut")}
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
               onClick={handleSignOut}
-              className="ms-auto text-[12.5px] font-semibold text-ink-soft hover:text-deep-palm"
+              className="w-full rounded-[10px] bg-bg px-3 py-2.5 text-start text-[12.5px] font-semibold text-ink-soft hover:text-deep-palm"
             >
               {t("common.signOut")}
             </button>
-          </div>
+          )}
         </div>
       </aside>
 
@@ -159,8 +188,8 @@ export function AppShell({
               href="/"
               className="flex shrink-0 items-center gap-2 md:hidden"
             >
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent font-[family-name:var(--font-outfit)] text-sm font-semibold text-white">
-                S
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-forest">
+                <MudirMark size={16} variant="lime" />
               </span>
             </Link>
             {showBranchSwitcher && <BranchSwitcher />}
@@ -186,6 +215,21 @@ export function AppShell({
                 </button>
               ))}
             </div>
+            {userInitials ? (
+              profileHref ? (
+                <Link
+                  href={profileHref}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-[11px] font-bold text-white"
+                  aria-label={t("nav.profile")}
+                >
+                  {userInitials}
+                </Link>
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-[11px] font-bold text-white">
+                  {userInitials}
+                </span>
+              )
+            ) : null}
             <button
               type="button"
               onClick={handleSignOut}

@@ -3,9 +3,6 @@
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { submitFoodSafetyReading } from "@/lib/actions/manager";
-import { Button, Input, Textarea, PageHeader, EmptyState } from "@/components/ui";
-import { PanelBlock } from "@/components/panel-block";
-import { StatusBadge } from "@/components/status-badge";
 import type {
   FoodSafetyStandard,
   FoodSafetyReading,
@@ -13,6 +10,7 @@ import type {
 } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
 import { startOfDay } from "date-fns";
+import { StatusBadge } from "@/components/status-badge";
 
 interface FoodSafetyPageClientProps {
   standards: FoodSafetyStandard[];
@@ -24,7 +22,7 @@ interface FoodSafetyPageClientProps {
 function formatRange(s: FoodSafetyStandard): string {
   if (s.range_type === "min_only") return `≥ ${s.min_value} ${s.unit}`;
   if (s.range_type === "max_only") return `≤ ${s.max_value} ${s.unit}`;
-  return `${s.min_value}–${s.max_value} ${s.unit}`;
+  return `${s.min_value} – ${s.max_value} ${s.unit}`;
 }
 
 function willFail(s: FoodSafetyStandard, raw: string): boolean | null {
@@ -96,79 +94,94 @@ export function FoodSafetyPageClient({
 
   return (
     <div className="pb-8">
-      <PageHeader title={t("foodSafetyTitle")} subtitle={t("foodSafetySubtitle")} />
+      <div className="mb-6">
+        <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+          {t("foodSafetyTitle")}
+        </h1>
+        <p className="mt-1 text-sm text-ink-soft">{t("foodSafetySubtitle")}</p>
+      </div>
+
       {message && <p className="mb-4 text-sm text-accent">{message}</p>}
 
       {standards.length === 0 ? (
-        <EmptyState message={tc("noResults")} />
+        <p className="py-8 text-center text-sm text-ink-faint">
+          {tc("noResults")}
+        </p>
       ) : (
-        <PanelBlock title={t("foodSafetyTitle")} role="manager">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {standards.map((s) => {
             const failing = willFail(s, values[s.id] ?? "");
             return (
               <div
                 key={s.id}
-                className="feature-row flex-col items-stretch gap-3 sm:flex-row sm:items-end"
+                className="rounded-2xl border border-border/70 bg-[#F4F4F2] p-4"
               >
-                <div className="flex min-w-0 flex-1 gap-3">
-                  <span className="feature-dot" />
-                  <div>
-                    <p className="text-sm font-semibold">{standardName(s)}</p>
-                    <p className="text-[13px] text-ink-soft">{formatRange(s)}</p>
-                  </div>
-                </div>
-                <div className="w-full space-y-2 sm:w-56">
-                  <Input
+                <p className="text-[14px] font-semibold text-ink">
+                  {standardName(s)}
+                </p>
+                <p className="mt-0.5 text-[12px] text-ink-soft">
+                  {formatRange(s)}
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <input
                     type="number"
                     step="any"
                     value={values[s.id] ?? ""}
                     onChange={(e) =>
                       setValues({ ...values, [s.id]: e.target.value })
                     }
-                    placeholder={t("enterValue")}
+                    placeholder={t("enterReading")}
+                    className="input-field min-w-0 flex-1 !py-2"
                   />
-                  {failing && (
-                    <Textarea
-                      value={notes[s.id] ?? ""}
-                      onChange={(e) =>
-                        setNotes({ ...notes, [s.id]: e.target.value })
-                      }
-                      placeholder={t("noteRequired")}
-                    />
-                  )}
-                  <Button
-                    className="w-full"
+                  <button
+                    type="button"
+                    className="btn-primary shrink-0 !px-3.5 !py-2 text-sm"
                     onClick={() => handleSubmit(s)}
                     disabled={!values[s.id] || loadingId === s.id}
                   >
                     {failing ? t("submitAndNotify") : t("submit")}
-                  </Button>
+                  </button>
                 </div>
+                {failing ? (
+                  <textarea
+                    value={notes[s.id] ?? ""}
+                    onChange={(e) =>
+                      setNotes({ ...notes, [s.id]: e.target.value })
+                    }
+                    placeholder={t("noteRequired")}
+                    className="input-field mt-2 min-h-[64px] resize-y text-sm"
+                  />
+                ) : null}
               </div>
             );
           })}
-        </PanelBlock>
+        </div>
       )}
 
-      <div className="mt-4">
-        <PanelBlock title={t("myReadingsToday")} role="manager">
-          {myToday.length === 0 ? (
-            <EmptyState message={tc("noResults")} />
-          ) : (
-            myToday.map((r) => (
-              <div key={r.id} className="feature-row">
-                <span className="feature-dot" />
+      <div className="mt-8">
+        <h2 className="mb-3 text-[15px] font-semibold text-ink">
+          {t("myReadingsToday")}
+        </h2>
+        {myToday.length === 0 ? (
+          <p className="text-sm text-ink-faint">{tc("noResults")}</p>
+        ) : (
+          <div className="space-y-2">
+            {myToday.map((r) => (
+              <div
+                key={r.id}
+                className="flex items-center gap-3 rounded-xl border border-border/70 bg-[#F4F4F2] px-4 py-3"
+              >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">{r.value}</p>
+                  <p className="text-sm font-semibold text-ink">{r.value}</p>
                   <p className="text-xs text-ink-soft">
                     {new Date(r.submitted_at).toLocaleTimeString()}
                   </p>
                 </div>
                 <StatusBadge status={r.passed ? "passed" : "failed"} />
               </div>
-            ))
-          )}
-        </PanelBlock>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

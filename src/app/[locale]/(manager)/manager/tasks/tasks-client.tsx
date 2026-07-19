@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { submitTaskCompletion, uploadProofWithRetry } from "@/lib/actions/manager";
-import { Button, Input, Textarea, PageHeader, EmptyState } from "@/components/ui";
-import { PanelBlock, FeatureRow } from "@/components/panel-block";
-import { StatusBadge } from "@/components/status-badge";
+import { Camera, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getItemStatus } from "@/lib/tasks/period";
 import type { TaskFrequency, Task, TaskItem, TaskCompletion } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
@@ -28,16 +27,21 @@ export function TasksPageClient({
   managerId,
 }: TasksPageClientProps) {
   const t = useTranslations("manager");
+  const tf = useTranslations("frequency");
   const tc = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
+  const [expanded, setExpanded] = useState<string | null>(
+    tasks[0]?.id ?? null
+  );
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [numbers, setNumbers] = useState<Record<string, string>>({});
   const [photos, setPhotos] = useState<Record<string, File | null>>({});
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const itemStats = (() => {
+  const itemStats = useMemo(() => {
     let done = 0;
     let total = 0;
     for (const task of tasks) {
@@ -53,9 +57,26 @@ export function TasksPageClient({
       }
     }
     return { done, total };
-  })();
+  }, [tasks, completions]);
 
-  async function handleSubmit(item: TaskItem, task: TaskWithItems) {
+  function taskStats(task: TaskWithItems) {
+    const items = task.task_items ?? [];
+    let doneCount = 0;
+    for (const item of items) {
+      const last = completions.find((c) => c.task_item_id === item.id);
+      const status = getItemStatus({
+        frequency: task.frequency as TaskFrequency,
+        createdAt: new Date(item.created_at),
+        lastCompletionAt: last ? new Date(last.submitted_at) : null,
+      });
+      if (status === "completed") doneCount++;
+    }
+    const pct =
+      items.length === 0 ? 0 : Math.round((doneCount / items.length) * 100);
+    return { doneCount, totalCount: items.length, pct };
+  }
+
+  async function handleSubmit(item: TaskItem) {
     setLoadingId(item.id);
     setUploadError(null);
     let photoUrl = "";
@@ -88,109 +109,218 @@ export function TasksPageClient({
 
   return (
     <div className="pb-8">
-      <PageHeader
-        title={t("tasksTitle")}
-        subtitle={t("progress", {
-          done: itemStats.done,
-          total: itemStats.total,
-        })}
-      />
+      <div className="mb-6">
+        <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+          {t("tasksTitle")}
+        </h1>
+        <p className="mt-1 text-sm text-ink-soft">{t("tasksSubtitle")}</p>
+        <p className="mt-1 text-xs text-ink-faint">
+          {t("progress", {
+            done: itemStats.done,
+            total: itemStats.total,
+          })}
+        </p>
+      </div>
+
       {uploadError && (
         <p className="mb-3 text-sm text-needs-attention">{uploadError}</p>
       )}
 
       {itemStats.total > 0 && itemStats.done === itemStats.total ? (
-        <EmptyState message={t("allCaughtUp")} />
+        <p className="mb-4 text-sm font-semibold text-on-track">
+          {t("allCaughtUp")}
+        </p>
       ) : null}
 
       {tasks.length === 0 ? (
-        <EmptyState message={tc("noResults")} />
+        <p className="py-8 text-center text-sm text-ink-faint">
+          {tc("noResults")}
+        </p>
       ) : (
-        tasks.map((task) => (
-          <PanelBlock
-            key={task.id}
-            title={locale === "ar" && task.title_ar ? task.title_ar : task.title}
-            role="manager"
-            className="mb-6"
-          >
-            {(task.task_items ?? []).map((item) => {
-              const lastCompletion = completions.find(
-                (c) => c.task_item_id === item.id
-              );
-              const status = getItemStatus({
-                frequency: task.frequency as TaskFrequency,
-                createdAt: new Date(item.created_at),
-                lastCompletionAt: lastCompletion
-                  ? new Date(lastCompletion.submitted_at)
-                  : null,
-              });
-              const label =
-                locale === "ar" && item.label_ar ? item.label_ar : item.label;
-              const isDone = status === "completed";
+        <div className="flex flex-col gap-3">
+          {tasks.map((task) => {
+            const open = expanded === task.id;
+            const stats = taskStats(task);
+            const title =
+              locale === "ar" && task.title_ar ? task.title_ar : task.title;
+            const freqKey = task.frequency as "daily" | "weekly" | "monthly";
 
-              return (
-                <div key={item.id} className="feature-row flex-col items-stretch gap-3 sm:flex-row sm:items-start">
-                  <div className="flex min-w-0 flex-1 gap-3">
-                    <span className="feature-dot" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold">{label}</p>
-                      <div className="mt-1 flex flex-wrap gap-2 text-xs text-ink-faint">
-                        {item.requires_photo && <span>{t("uploadPhoto")}</span>}
-                        {item.requires_note && <span>{t("addNote")}</span>}
-                        {item.requires_number && <span>{t("enterValue")}</span>}
-                      </div>
-                    </div>
-                    <StatusBadge status={status} />
+            return (
+              <div
+                key={task.id}
+                className="overflow-hidden rounded-2xl border border-[#E8D5D0] bg-[#F6EDE9]"
+              >
+                <button
+                  type="button"
+                  onClick={() => setExpanded(open ? null : task.id)}
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-start"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-semibold text-ink">
+                      {title}
+                    </p>
+                    <p className="mt-0.5 text-[12px] text-ink-soft">
+                      {tf(freqKey)} · {stats.doneCount}/{stats.totalCount}{" "}
+                      {t("itemsLabel")}
+                    </p>
                   </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/70 text-[11px] font-bold tabular-nums text-ink-soft">
+                    {stats.pct}%
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-ink-faint transition-transform",
+                      open && "rotate-180"
+                    )}
+                  />
+                </button>
 
-                  {!isDone && (
-                    <div className="space-y-2 sm:w-64">
-                      {item.requires_note && (
-                        <Textarea
-                          value={notes[item.id] ?? ""}
-                          onChange={(e) =>
-                            setNotes({ ...notes, [item.id]: e.target.value })
-                          }
-                          placeholder={t("addNote")}
-                        />
-                      )}
-                      {item.requires_number && (
-                        <Input
-                          type="number"
-                          value={numbers[item.id] ?? ""}
-                          onChange={(e) =>
-                            setNumbers({ ...numbers, [item.id]: e.target.value })
-                          }
-                          placeholder={t("enterValue")}
-                        />
-                      )}
-                      {item.requires_photo && (
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            setPhotos({
-                              ...photos,
-                              [item.id]: e.target.files?.[0] ?? null,
-                            })
-                          }
-                          className="text-xs"
-                        />
-                      )}
-                      <Button
-                        onClick={() => handleSubmit(item, task)}
-                        disabled={loadingId === item.id}
-                        className="w-full"
-                      >
-                        {t("submit")}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </PanelBlock>
-        ))
+                {open ? (
+                  <div className="space-y-2 px-3 pb-3">
+                    {(task.task_items ?? []).map((item) => {
+                      const lastCompletion = completions.find(
+                        (c) => c.task_item_id === item.id
+                      );
+                      const status = getItemStatus({
+                        frequency: task.frequency as TaskFrequency,
+                        createdAt: new Date(item.created_at),
+                        lastCompletionAt: lastCompletion
+                          ? new Date(lastCompletion.submitted_at)
+                          : null,
+                      });
+                      const label =
+                        locale === "ar" && item.label_ar
+                          ? item.label_ar
+                          : item.label;
+                      const isDone = status === "completed";
+                      const needsProof =
+                        item.requires_photo ||
+                        item.requires_note ||
+                        item.requires_number;
+                      const canSubmit =
+                        !item.requires_photo || !!photos[item.id];
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="rounded-xl border border-border/50 bg-white px-3.5 py-3"
+                        >
+                          <label className="flex items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={isDone}
+                              disabled={isDone || loadingId === item.id}
+                              onChange={() => {
+                                if (isDone) return;
+                                if (
+                                  item.requires_note &&
+                                  !notes[item.id]?.trim()
+                                )
+                                  return;
+                                if (
+                                  item.requires_number &&
+                                  !numbers[item.id]
+                                )
+                                  return;
+                                if (item.requires_photo && !photos[item.id])
+                                  return;
+                                void handleSubmit(item);
+                              }}
+                              className="mt-0.5 h-4 w-4 rounded border-border accent-forest"
+                            />
+                            <span
+                              className={cn(
+                                "text-[14px] font-medium text-ink",
+                                isDone && "text-ink-faint line-through"
+                              )}
+                            >
+                              {label}
+                            </span>
+                          </label>
+
+                          {!isDone && needsProof ? (
+                            <div className="mt-2.5 space-y-2 ps-7">
+                              {item.requires_photo ? (
+                                <>
+                                  <input
+                                    ref={(el) => {
+                                      fileRefs.current[item.id] = el;
+                                    }}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) =>
+                                      setPhotos({
+                                        ...photos,
+                                        [item.id]:
+                                          e.target.files?.[0] ?? null,
+                                      })
+                                    }
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      fileRefs.current[item.id]?.click()
+                                    }
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-[#F4F4F2] px-2.5 py-1.5 text-[12px] font-semibold text-ink-soft hover:text-forest"
+                                  >
+                                    <Camera className="h-3.5 w-3.5" />
+                                    {photos[item.id]
+                                      ? photos[item.id]!.name.slice(0, 18)
+                                      : t("addPhoto")}
+                                  </button>
+                                </>
+                              ) : null}
+                              {item.requires_note ? (
+                                <input
+                                  className="input-field !py-2 text-sm"
+                                  value={notes[item.id] ?? ""}
+                                  onChange={(e) =>
+                                    setNotes({
+                                      ...notes,
+                                      [item.id]: e.target.value,
+                                    })
+                                  }
+                                  placeholder={t("addNotePlaceholder")}
+                                />
+                              ) : null}
+                              {item.requires_number ? (
+                                <input
+                                  type="number"
+                                  className="input-field !py-2 text-sm"
+                                  value={numbers[item.id] ?? ""}
+                                  onChange={(e) =>
+                                    setNumbers({
+                                      ...numbers,
+                                      [item.id]: e.target.value,
+                                    })
+                                  }
+                                  placeholder={t("enterValue")}
+                                />
+                              ) : null}
+                              {canSubmit ||
+                              item.requires_note ||
+                              item.requires_number ? (
+                                <button
+                                  type="button"
+                                  disabled={loadingId === item.id}
+                                  onClick={() => void handleSubmit(item)}
+                                  className="btn-primary !px-3 !py-1.5 text-xs"
+                                >
+                                  {t("submit")}
+                                </button>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
