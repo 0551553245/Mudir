@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createManager, deleteManager } from "@/lib/actions/owner";
-import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
-import { PanelBlock, FeatureRow } from "@/components/panel-block";
+import {
+  Button,
+  Input,
+  Select,
+  Modal,
+  ModalActions,
+  modalFormClassName,
+  EmptyState,
+} from "@/components/ui";
 import type { Branch } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
 import { MAX_MANAGERS_PER_BRANCH } from "@/lib/supabase/types";
@@ -14,7 +21,7 @@ interface ManagerRow {
   user_id: string;
   branch_id: string;
   profiles: { full_name: string | null; email: string } | null;
-  branches: { name: string } | null;
+  branches: { name: string; address?: string | null } | null;
 }
 
 interface ManagersClientProps {
@@ -70,35 +77,76 @@ export function ManagersClient({
 
   return (
     <div>
-      <PageHeader
-        title={t("managersTitle")}
-        subtitle={t("managersSubtitle")}
-        action={
-          <Button onClick={() => setOpen(true)}>{t("addManager")}</Button>
-        }
-      />
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+            {t("managersTitle")}
+          </h1>
+          <p className="mt-1 text-sm text-ink-soft">{t("managersSubtitle")}</p>
+        </div>
+        <Button onClick={() => setOpen(true)} className="!rounded-full">
+          + {t("addManager")}
+        </Button>
+      </div>
 
-      <PanelBlock title={t("managersTitle")} role="owner">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         {managers.length === 0 ? (
           <EmptyState message={tc("noResults")} />
         ) : (
-          managers.map((m) => (
-            <FeatureRow
-              key={m.id}
-              title={m.profiles?.full_name ?? m.profiles?.email ?? "—"}
-              description={m.branches?.name ?? "—"}
-              trailing={
-                <button
-                  onClick={() => handleDelete(m.id, m.user_id)}
-                  className="text-xs text-needs-attention hover:underline"
+          <ul>
+            {managers.map((m) => {
+              const name = m.profiles?.full_name?.trim();
+              const email = m.profiles?.email ?? "—";
+              const invited = !name;
+              const branchLabel = m.branches
+                ? m.branches.address
+                  ? `${m.branches.name} — ${m.branches.address}`
+                  : m.branches.name
+                : "—";
+              return (
+                <li
+                  key={m.id}
+                  className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3.5 last:border-b-0 sm:gap-4"
                 >
-                  {tc("delete")}
-                </button>
-              }
-            />
-          ))
+                  <div className="min-w-[140px] flex-1">
+                    <p
+                      className={
+                        invited
+                          ? "text-sm text-ink-faint"
+                          : "text-sm font-semibold text-ink"
+                      }
+                    >
+                      {invited ? t("invitedPlaceholder") : name}
+                    </p>
+                  </div>
+                  <p className="min-w-[120px] flex-1 text-[13px] text-ink-soft">
+                    {branchLabel}
+                  </p>
+                  <p className="min-w-[140px] flex-[1.2] font-mono text-[12px] text-ink-faint">
+                    {email}
+                  </p>
+                  <span
+                    className={
+                      invited
+                        ? "rounded-full bg-[#FFF3E6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#A85A1E]"
+                        : "rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#3B5B8A]"
+                    }
+                  >
+                    {invited ? t("statusInvited") : t("statusActive")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(m.id, m.user_id)}
+                    className="text-xs text-needs-attention hover:underline"
+                  >
+                    {tc("delete")}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         )}
-      </PanelBlock>
+      </div>
 
       <Modal
         open={open}
@@ -123,14 +171,23 @@ export function ManagersClient({
           <Input name="full_name" label={tc("required")} required />
           <div className="grid gap-2.5 sm:grid-cols-2">
             <Input name="email" type="email" label="Email" required />
-            <Input name="password" type="password" label="Password" required minLength={8} />
+            <Input
+              name="password"
+              type="password"
+              label="Password"
+              required
+              minLength={8}
+            />
           </div>
           <Select
             name="branch_id"
             label={t("assignBranch")}
             required
             options={branches
-              .filter((b) => (branchManagerCounts[b.id] ?? 0) < MAX_MANAGERS_PER_BRANCH)
+              .filter(
+                (b) =>
+                  (branchManagerCounts[b.id] ?? 0) < MAX_MANAGERS_PER_BRANCH
+              )
               .map((b) => ({
                 value: b.id,
                 label: `${b.name} (${branchManagerCounts[b.id] ?? 0}/${MAX_MANAGERS_PER_BRANCH})`,

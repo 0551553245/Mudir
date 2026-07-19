@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createFoodSafetyStandard } from "@/lib/actions/owner";
 import { acknowledgeReading } from "@/lib/actions/settings";
-import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
+import { Button, Input, Select, Modal, ModalActions, modalFormClassName, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
 import { useOptionalBranchContext } from "@/components/branch-context";
 import { cn } from "@/lib/utils";
@@ -95,48 +95,56 @@ export function FoodSafetyClient({
 
   return (
     <div>
-      <PageHeader
-        title={t("foodSafetyTitle")}
-        subtitle={t("foodSafetySubtitle")}
-        action={
-          <div className="flex gap-2">
-            <div className="flex rounded-md border border-border p-0.5">
-              <button
-                type="button"
-                className={cn(
-                  "rounded px-3 py-1 text-xs",
-                  view === "log" ? "bg-accent text-accent-contrast" : "text-ink-soft"
-                )}
-                onClick={() => setView("log")}
-              >
-                {t("viewLog")}
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  "rounded px-3 py-1 text-xs",
-                  view === "grid" ? "bg-accent text-accent-contrast" : "text-ink-soft"
-                )}
-                onClick={() => setView("grid")}
-              >
-                {t("viewByBranch")}
-              </button>
-            </div>
-            <Button onClick={() => setOpen(true)}>{t("addStandard")}</Button>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+            {t("foodSafetyTitle")}
+          </h1>
+          <p className="mt-1 text-sm text-ink-soft">{t("foodSafetySubtitle")}</p>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex rounded-xl border border-border bg-card p-0.5">
+            <button
+              type="button"
+              className={cn(
+                "rounded-[10px] px-3 py-1.5 text-xs font-semibold",
+                view === "log"
+                  ? "bg-forest text-white"
+                  : "text-ink-soft hover:text-forest"
+              )}
+              onClick={() => setView("log")}
+            >
+              {t("viewLog")}
+            </button>
+            <button
+              type="button"
+              className={cn(
+                "rounded-[10px] px-3 py-1.5 text-xs font-semibold",
+                view === "grid"
+                  ? "bg-forest text-white"
+                  : "text-ink-soft hover:text-forest"
+              )}
+              onClick={() => setView("grid")}
+            >
+              {t("viewByBranch")}
+            </button>
           </div>
-        }
-      />
+          <Button onClick={() => setOpen(true)} className="!rounded-full">
+            + {t("addStandard")}
+          </Button>
+        </div>
+      </div>
 
       {unresolved.length > 0 && (
-        <div className="mb-4 space-y-2 rounded-lg border border-needs-attention/40 bg-needs-attention-bg p-3">
+        <div className="mb-4 space-y-2 rounded-2xl border border-[#E8A0A8] bg-[#FBEAEB] p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-needs-attention">
+            <p className="text-sm font-semibold text-[#9C3F4A]">
               {t("unresolvedFailures")} ({unresolved.length})
             </p>
             {unresolved.length > 3 && (
               <button
                 type="button"
-                className="text-xs text-needs-attention underline"
+                className="text-xs text-[#9C3F4A] underline"
                 onClick={() => setShowAllFailures((v) => !v)}
               >
                 {t("viewAllFailures")}

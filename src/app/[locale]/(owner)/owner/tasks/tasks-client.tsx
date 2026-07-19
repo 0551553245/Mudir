@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createTask, updateTask, deleteTask } from "@/lib/actions/owner";
-import { Button, Input, Select, Modal, ModalActions, modalFormClassName, PageHeader, EmptyState } from "@/components/ui";
-import { PanelBlock, FeatureRow } from "@/components/panel-block";
+import { Button, Input, Select, Modal, ModalActions, modalFormClassName, EmptyState } from "@/components/ui";
+import { PanelBlock } from "@/components/panel-block";
 import { useOptionalBranchContext } from "@/components/branch-context";
 import { getItemStatus } from "@/lib/tasks/period";
 import { itemStatusToVocab, statusPillClass } from "@/lib/status";
 import { cn } from "@/lib/utils";
-import type { Branch, Task, TaskCategory, TaskFrequency, TaskItem } from "@/lib/supabase/types";
+import type { Branch, Task, TaskFrequency, TaskItem } from "@/lib/supabase/types";
 import { TASK_CATEGORIES } from "@/lib/supabase/types";
 import { useRouter } from "@/i18n/navigation";
 
@@ -122,88 +122,175 @@ export function TasksClient({
     return locale === "ar" && task.title_ar ? task.title_ar : task.title;
   }
 
-  function categoryClass(c: TaskCategory | undefined) {
-    const map: Record<TaskCategory, string> = {
-      opening: "bg-info-bg text-info",
-      closing: "bg-behind-bg text-behind",
-      food_safety: "bg-on-track-bg text-on-track",
-      cleaning: "bg-accent-muted text-accent",
-      custom: "tag-admin",
-    };
-    return map[c ?? "custom"];
-  }
-
   return (
     <div>
-      <PageHeader
-        title={t("tasksTitle")}
-        subtitle={t("tasksSubtitle")}
-        action={
-          <div className="flex gap-2">
-            <div className="flex rounded-md border border-border p-0.5">
-              <button
-                type="button"
-                className={cn(
-                  "rounded px-3 py-1 text-xs",
-                  view === "list" ? "bg-accent text-accent-contrast" : "text-ink-soft"
-                )}
-                onClick={() => setView("list")}
-              >
-                {t("viewList")}
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  "rounded px-3 py-1 text-xs",
-                  view === "grid" ? "bg-accent text-accent-contrast" : "text-ink-soft"
-                )}
-                onClick={() => setView("grid")}
-              >
-                {t("viewByBranch")}
-              </button>
-            </div>
-            <Button onClick={openCreate}>{t("addTask")}</Button>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+            {t("tasksTitle")}
+          </h1>
+          <p className="mt-1 text-sm text-ink-soft">{t("tasksSubtitle")}</p>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex rounded-xl border border-border bg-card p-0.5">
+            <button
+              type="button"
+              className={cn(
+                "rounded-[10px] px-3 py-1.5 text-xs font-semibold",
+                view === "list"
+                  ? "bg-forest text-white"
+                  : "text-ink-soft hover:text-forest"
+              )}
+              onClick={() => setView("list")}
+            >
+              {t("viewList")}
+            </button>
+            <button
+              type="button"
+              className={cn(
+                "rounded-[10px] px-3 py-1.5 text-xs font-semibold",
+                view === "grid"
+                  ? "bg-forest text-white"
+                  : "text-ink-soft hover:text-forest"
+              )}
+              onClick={() => setView("grid")}
+            >
+              {t("viewByBranch")}
+            </button>
           </div>
-        }
-      />
+          <Button onClick={openCreate} className="!rounded-full">
+            + {t("addTask")}
+          </Button>
+        </div>
+      </div>
 
       {view === "list" ? (
-        <PanelBlock title={t("tasksTitle")} role="owner">
-          {filteredTasks.length === 0 ? (
-            <EmptyState message={t("tasksSubtitle")} />
-          ) : (
-            filteredTasks.map((task) => (
-              <FeatureRow
-                key={task.id}
-                title={taskTitle(task)}
-                description={`${tf(task.frequency)} · ${task.task_items?.length ?? 0} · ${task.branch_id ? branches.find((b) => b.id === task.branch_id)?.name : tc("allBranches")}`}
-                trailing={
-                  <div className="flex items-center gap-2">
-                    <span className={cn("tag-pill", categoryClass(task.category))}>
-                      {cat(task.category ?? "custom")}
+        filteredTasks.length === 0 ? (
+          <EmptyState message={t("tasksSubtitle")} />
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {filteredTasks.map((task, idx) => {
+              const tones = [
+                { bg: "#F0F0EE", ring: "#7A7A76" },
+                { bg: "#E8F3EE", ring: "#3D8F72" },
+                { bg: "#F5EFE6", ring: "#B08A4A" },
+                { bg: "#F6E8E6", ring: "#C07070" },
+              ];
+              const tone = tones[idx % 4];
+              const items = task.task_items ?? [];
+              let done = 0;
+              for (const item of items) {
+                const last = completions.find((c) => c.task_item_id === item.id);
+                const status = getItemStatus({
+                  frequency: task.frequency as TaskFrequency,
+                  createdAt: new Date(item.created_at),
+                  lastCompletionAt: last
+                    ? new Date(last.submitted_at)
+                    : null,
+                });
+                if (status === "completed") done++;
+              }
+              const pct =
+                items.length === 0
+                  ? 0
+                  : Math.round((done / items.length) * 100);
+              const r = 18;
+              const c = 2 * Math.PI * r;
+              const dash = `${((pct / 100) * c).toFixed(1)} ${c}`;
+              const branchName = task.branch_id
+                ? branches.find((b) => b.id === task.branch_id)?.name
+                : tc("allBranches");
+              const needsPhoto = items.some((i) => i.requires_photo);
+              const needsNote = items.some((i) => i.requires_note);
+
+              return (
+                <div
+                  key={task.id}
+                  className="flex flex-col rounded-2xl border border-border/60 p-4"
+                  style={{ background: tone.bg }}
+                >
+                  <div className="mb-3 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-[14.5px] font-semibold text-ink">
+                        {taskTitle(task)}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-ink-soft">
+                        {branchName} · {items.length} {t("itemsShort")}
+                      </p>
+                    </div>
+                    <div className="relative h-11 w-11 shrink-0">
+                      <svg width="44" height="44" viewBox="0 0 44 44">
+                        <circle
+                          cx="22"
+                          cy="22"
+                          r={r}
+                          fill="none"
+                          stroke="rgba(22,22,22,0.08)"
+                          strokeWidth="4"
+                        />
+                        <circle
+                          cx="22"
+                          cy="22"
+                          r={r}
+                          fill="none"
+                          stroke={tone.ring}
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray={dash}
+                          transform="rotate(-90 22 22)"
+                        />
+                      </svg>
+                      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-ink">
+                        {pct}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mb-3 flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase text-ink-soft">
+                      {tf(task.frequency)}
                     </span>
+                    {needsPhoto ? (
+                      <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold text-ink-soft">
+                        {t("tagPhoto")}
+                      </span>
+                    ) : null}
+                    {needsNote ? (
+                      <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold text-ink-soft">
+                        {t("tagNote")}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="mb-3 h-2 overflow-hidden rounded-full bg-white/60">
+                    <div
+                      className="h-full rounded-full bg-forest"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="mt-auto flex items-center justify-between gap-2">
                     <button
+                      type="button"
                       onClick={() => openEdit(task)}
-                      className="text-xs text-accent hover:underline"
+                      className="rounded-lg border border-border/80 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-ink-soft hover:text-forest"
                     >
                       {tc("edit")}
                     </button>
                     <button
+                      type="button"
                       onClick={async () => {
                         if (!confirm(tc("confirm"))) return;
                         await deleteTask(task.id);
                         router.refresh();
                       }}
-                      className="text-xs text-needs-attention hover:underline"
+                      className="text-[11px] text-needs-attention hover:underline"
                     >
                       {tc("delete")}
                     </button>
                   </div>
-                }
-              />
-            ))
-          )}
-        </PanelBlock>
+                </div>
+              );
+            })}
+          </div>
+        )
       ) : (
         <PanelBlock title={t("viewByBranch")} role="owner">
           <div className="overflow-x-auto">

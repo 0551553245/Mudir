@@ -184,62 +184,99 @@ export function BillingClient({
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="pricing-box">
-          <p className="font-mono text-xs uppercase tracking-wider opacity-80">
-            {access.status}
+      <div className="mb-6">
+        <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+          {t("billingTitle")}
+        </h1>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl bg-forest p-6 text-white">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+            {tb("currentPlan")}
           </p>
-          <p className="mt-4 font-display text-5xl">
-            {access.isEnterprise ? "—" : formatSAR(access.monthlyAmountSar, locale)}
+          <p className="mt-3 font-[family-name:var(--font-baloo)] text-4xl font-bold">
+            {access.isEnterprise
+              ? "—"
+              : formatSAR(BRANCH_PRICE_SAR, locale)}
           </p>
-          <p className="mt-2 text-sm opacity-90">
-            {formatSAR(BRANCH_PRICE_SAR, locale)} × {access.paidBranchLimit}{" "}
-            {locale === "ar" ? "فروع" : "branches"}
-          </p>
-          <ul className="mt-6 space-y-2 text-sm">
-            <li>✓ {t("branchCount", { count: access.branchCount })}</li>
-            <li>
-              ✓{" "}
-              {locale === "ar"
-                ? `${access.paidBranchLimit} خانات مدفوعة`
-                : `${access.paidBranchLimit} paid branch slots`}
-            </li>
-            <li>✓ {locale === "ar" ? "مديران لكل فرع" : "2 managers per branch included"}</li>
-            {access.nextInvoiceDate && (
-              <li>
-                ✓ {tb("nextInvoice")}:{" "}
-                {format(access.nextInvoiceDate, "PP")}
-              </li>
-            )}
+          <p className="mt-1 text-sm text-white/80">{tb("perBranchMonth")}</p>
+          <div className="my-4 h-px bg-white/20" />
+          <ul className="space-y-2 text-sm text-white/90">
+            <li>✓ {tb("featureManagers")}</li>
+            <li>✓ {tb("featureRealtime")}</li>
+            <li>✓ {tb("featureUnlimited")}</li>
           </ul>
         </div>
 
-        <PanelBlock title={t("billingTitle")} role="owner">
-          {access.status === "trialing" && access.trialDaysLeft > 0 && (
-            <FeatureRow
-              title={t("trialDaysLeft", { days: access.trialDaysLeft })}
-              description={tb("noCardRequired")}
-            />
-          )}
-          <FeatureRow
-            title={tb("activeBranches")}
-            description={`${access.branchCount}`}
-          />
-          <FeatureRow
-            title={tb("paidBranchLimit")}
-            description={`${access.paidBranchLimit}`}
-          />
-          <FeatureRow
-            title={tb("subscriptionStatus")}
-            description={subscription?.status ?? restaurant.subscription_status}
-          />
-          {access.isEnterprise && (
-            <FeatureRow
-              title={t("enterpriseNote")}
-              description="sales@scopsa.com"
-            />
-          )}
-        </PanelBlock>
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="space-y-3 border-b border-border px-5 py-4 text-sm">
+            <div className="flex justify-between gap-2">
+              <span className="text-ink-soft">{tb("activeBranches")}</span>
+              <span className="font-semibold text-ink">{access.branchCount}</span>
+            </div>
+            <div className="flex justify-between gap-2">
+              <span className="text-ink-soft">{tb("managersIncluded")}</span>
+              <span className="font-semibold text-ink">
+                {access.branchCount * 2}
+              </span>
+            </div>
+            <div className="flex justify-between gap-2">
+              <span className="text-ink-soft">{tb("nextInvoice")}</span>
+              <span className="font-semibold text-ink">
+                {access.isEnterprise
+                  ? "—"
+                  : formatSAR(access.monthlyAmountSar, locale)}
+              </span>
+            </div>
+          </div>
+
+          {access.status === "trialing" && access.trialDaysLeft > 0 ? (
+            <div className="border-b border-border px-5 py-4">
+              <div className="rounded-xl border border-[#E8C39A] bg-[#FFF6EB] px-3 py-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-ink-soft">{tb("freeTrial")}</span>
+                  <span className="font-bold text-ink">
+                    {t("trialDaysLeft", { days: access.trialDaysLeft })}
+                  </span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+                  <div
+                    className="h-full rounded-full bg-[#E0A23B]"
+                    style={{
+                      width: `${Math.max(8, Math.min(100, (access.trialDaysLeft / 14) * 100))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="px-5 py-4">
+            <p className="text-sm text-ink-soft">{tb("paymentMethods")}</p>
+            {paymentMethods[0] ? (
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-ink">
+                  {paymentMethods[0].card_company ?? "card"} ****{" "}
+                  {paymentMethods[0].card_last_four ?? "••••"}
+                </p>
+                <button
+                  type="button"
+                  className="rounded-full border border-forest px-3 py-1.5 text-xs font-semibold text-forest"
+                  onClick={() =>
+                    document
+                      .getElementById("owner-billing-checkout")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  {tb("updatePayment")}
+                </button>
+              </div>
+            ) : (
+              <p className="mt-1 text-sm text-ink-faint">{tb("noCardRequired")}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {needsUpgrade && (
@@ -253,7 +290,7 @@ export function BillingClient({
       )}
 
       {showCheckout && (
-        <div className="mt-6 panel-block p-6">
+        <div id="owner-billing-checkout" className="mt-6 panel-block p-6">
           <h3 className="mb-4 font-display text-lg">
             {access.requiresPayment ? tb("subscribeNow") : tb("updatePayment")}
           </h3>

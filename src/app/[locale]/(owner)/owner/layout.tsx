@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app-shell";
 import { BranchProvider } from "@/components/branch-context";
 import { SubscriptionBanner } from "@/components/subscription-banner";
+import { initialsFromName } from "@/components/manager-ui";
 import { getProfile, getOwnerRestaurant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/navigation";
@@ -14,8 +15,6 @@ const ownerNav = [
   { href: "/owner/schedule", labelKey: "nav.schedule" },
   { href: "/owner/reports", labelKey: "nav.reports" },
   { href: "/owner/billing", labelKey: "nav.billing" },
-  { href: "/owner/account", labelKey: "nav.account" },
-  { href: "/owner/settings", labelKey: "nav.settings" },
 ];
 
 export default async function OwnerLayout({
@@ -29,6 +28,7 @@ export default async function OwnerLayout({
   const profile = await getProfile();
   if (!profile || profile.role !== "owner") {
     redirect({ href: "/login", locale });
+    return null;
   }
 
   const restaurant = await getOwnerRestaurant();
@@ -50,6 +50,8 @@ export default async function OwnerLayout({
         navItems={ownerNav}
         restaurantId={restaurant?.id}
         showBranchSwitcher
+        userInitials={initialsFromName(profile.full_name, profile.email)}
+        profileHref="/owner/account"
       >
         {children}
       </AppShell>

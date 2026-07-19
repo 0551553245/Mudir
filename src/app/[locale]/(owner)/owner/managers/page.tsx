@@ -9,7 +9,7 @@ export default async function ManagersPage() {
   const supabase = await createClient();
   const { data: managers } = await supabase
     .from("managers")
-    .select("*, profiles(full_name, email), branches(name)")
+    .select("*, profiles(full_name, email), branches(name, address)")
     .eq("restaurant_id", restaurant.id);
 
   const { data: branches } = await supabase

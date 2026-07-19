@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getOwnerRestaurant } from "@/lib/supabase/auth";
 import { fetchOwnerReportData } from "@/lib/analytics/fetch-owner-report";
 import { chartPointsForPreset } from "@/lib/analytics/owner-reports";
-import { PageHeader, EmptyState } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow, StatCard } from "@/components/panel-block";
 import { BarChart, RateChart } from "@/components/charts/bar-chart";
 import type { DateRangePreset } from "@/lib/analytics/types";
@@ -60,7 +60,12 @@ export default async function OwnerReportsPage({
 
   return (
     <div>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <div className="mb-6">
+        <h1 className="font-[family-name:var(--font-baloo)] text-[28px] font-bold tracking-tight text-forest">
+          {t("title")}
+        </h1>
+        <p className="mt-1 text-sm text-ink-soft">{t("subtitle")}</p>
+      </div>
 
       <Suspense>
         <ReportsFilters
