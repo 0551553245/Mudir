@@ -1,6 +1,6 @@
 import { addDays, differenceInDays, isPast } from "date-fns";
 import {
-  BRANCH_PRICE_SAR,
+  PRICE_PER_BRANCH_SAR,
   ENTERPRISE_BRANCH_THRESHOLD,
   type Restaurant,
   type Subscription,
@@ -21,10 +21,14 @@ export interface SubscriptionAccess {
   monthlyAmountSar: number;
   monthlyAmountHalalas: number;
   nextInvoiceDate: Date | null;
+  pricePerBranchSar: number;
 }
 
-export function computeMonthlyAmount(branchCount: number): number {
-  return branchCount * BRANCH_PRICE_SAR;
+export function computeMonthlyAmount(
+  branchSlots: number,
+  pricePerBranchSar: number = PRICE_PER_BRANCH_SAR
+): number {
+  return branchSlots * pricePerBranchSar;
 }
 
 export function evaluateSubscription(
@@ -44,10 +48,20 @@ export function evaluateSubscription(
     isPast(new Date(restaurant.trial_ends_at));
 
   const status = restaurant.subscription_status;
+  const pricePerBranchSar =
+    Number(subscription?.price_per_branch_sar) || PRICE_PER_BRANCH_SAR;
   const paidBranchLimit = subscription?.paid_branch_limit ?? 0;
   const isEnterprise =
     status === "enterprise" || branchCount >= ENTERPRISE_BRANCH_THRESHOLD;
-  const monthlyAmountSar = computeMonthlyAmount(branchCount);
+
+  // Bill for paid slots (not only created branches) — removing a branch does not lower MRR
+  const billedSlots = isEnterprise
+    ? branchCount
+    : Math.max(paidBranchLimit, 0);
+  const monthlyAmountSar = computeMonthlyAmount(
+    billedSlots,
+    pricePerBranchSar
+  );
   const monthlyAmountHalalas = sarToHalalas(monthlyAmountSar);
 
   const nextInvoiceDate = subscription?.current_period_end
@@ -56,7 +70,8 @@ export function evaluateSubscription(
 
   const isTrialing = status === "trialing" && !trialExpired;
   const isActive = status === "active";
-  const isPastDue = status === "past_due" || (status === "trialing" && !!trialExpired);
+  const isPastDue =
+    status === "past_due" || (status === "trialing" && !!trialExpired);
   const isCanceled = status === "canceled";
 
   const canUsePlatform =
@@ -70,13 +85,17 @@ export function evaluateSubscription(
 
   const requiresPayment = isPastDue && !isEnterprise;
 
+  // Within paid slots → free to create; at/over limit → must upgrade (pay +1)
+  const withinPaidSlots =
+    paidBranchLimit > 0 && branchCount < paidBranchLimit;
+
   const canAddBranch =
     !isCanceled &&
     !isEnterprise &&
     branchCount < ENTERPRISE_BRANCH_THRESHOLD &&
-    (isTrialing ||
-      (isActive && branchCount < paidBranchLimit) ||
-      (isPastDue && branchCount < paidBranchLimit));
+    (isTrialing || isActive || isPastDue) &&
+    withinPaidSlots &&
+    !requiresPayment;
 
   return {
     status: isPastDue && status === "trialing" ? "past_due" : status,
@@ -91,6 +110,7 @@ export function evaluateSubscription(
     monthlyAmountSar,
     monthlyAmountHalalas,
     nextInvoiceDate,
+    pricePerBranchSar,
   };
 }
 
@@ -113,13 +133,10 @@ export function getBranchBlockReason(
       ? "انتهت التجربة المجانية — أضف طريقة دفع للمتابعة"
       : "Free trial ended — add a payment method to continue";
   }
-  if (
-    access.status === "active" &&
-    access.branchCount >= access.paidBranchLimit
-  ) {
+  if (access.branchCount >= access.paidBranchLimit) {
     return locale === "ar"
-      ? "حدّث خطتك في الفوترة لإضافة فرع جديد"
-      : "Update your plan on the billing page to add a branch";
+      ? `استخدمت كل فروع خطتك (${access.paidBranchLimit}). أضف فرعًا مقابل ${access.pricePerBranchSar} ر.س/شهر.`
+      : `You've used all ${access.paidBranchLimit} branches on your plan. Add 1 branch for ${access.pricePerBranchSar} SAR/month.`;
   }
   if (access.branchCount >= ENTERPRISE_BRANCH_THRESHOLD) {
     return locale === "ar"

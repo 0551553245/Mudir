@@ -155,9 +155,11 @@ export interface ScheduleEvent {
 export interface Subscription {
   id: string;
   restaurant_id: string;
-  plan: string;
   branch_count: number;
+  /** Paid branch slots (branches_limit). Deleting a branch does not reduce this until renewal. */
   paid_branch_limit: number;
+  price_per_branch_sar: number;
+  total_price_sar: number;
   status: SubscriptionStatus;
   moyasar_customer_id: string | null;
   moyasar_subscription_id: string | null;
@@ -209,7 +211,9 @@ export interface ActivityLogEntry {
   created_at: string;
 }
 
+/** Single source of truth for per-branch monthly price (SAR). */
 export const BRANCH_PRICE_SAR = 50;
+export const PRICE_PER_BRANCH_SAR = BRANCH_PRICE_SAR;
 export const MAX_MANAGERS_PER_BRANCH = 2;
 export const TRIAL_DAYS = 14;
 export const ENTERPRISE_BRANCH_THRESHOLD = 10;

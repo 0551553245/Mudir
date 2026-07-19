@@ -178,8 +178,8 @@ export function AppShell({
                   className={cn(
                     "rounded-[7px] px-2.5 py-1.5 transition-colors",
                     currentLocale === l
-                      ? "bg-[#1B4332] text-white"
-                      : "text-ink-soft hover:text-deep-palm"
+                      ? "bg-forest text-white"
+                      : "text-ink-soft hover:text-forest"
                   )}
                 >
                   {localeNames[l]}

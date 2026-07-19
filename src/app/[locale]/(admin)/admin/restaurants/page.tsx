@@ -16,7 +16,7 @@ export default async function AdminRestaurantsPage() {
   const { data: restaurants } = await supabase
     .from("restaurants")
     .select(
-      "*, profiles!restaurants_owner_user_id_fkey(full_name, email), branches(id), subscriptions(plan, branch_count, status, updated_at)"
+      "*, profiles!restaurants_owner_user_id_fkey(full_name, email), branches(id), subscriptions(paid_branch_limit, branch_count, status, total_price_sar, updated_at)"
     )
     .order("created_at", { ascending: false });
 
@@ -33,13 +33,16 @@ export default async function AdminRestaurantsPage() {
             const sub = Array.isArray(r.subscriptions)
               ? r.subscriptions[0]
               : (r.subscriptions as {
-                  plan: string;
+                  paid_branch_limit: number;
                   branch_count: number;
                   status: string;
+                  total_price_sar: number;
                   updated_at: string;
                 } | null);
             const branchCount = sub?.branch_count ?? branches.length;
-            const mrr = branchCount * BRANCH_PRICE_SAR;
+            const mrr =
+              Number(sub?.total_price_sar) ||
+              (sub?.paid_branch_limit ?? branchCount) * BRANCH_PRICE_SAR;
             const status = (sub?.status ?? r.subscription_status) as string;
             const lastActive = new Date(
               sub?.updated_at ?? r.updated_at
@@ -55,7 +58,7 @@ export default async function AdminRestaurantsPage() {
               <FeatureRow
                 key={r.id}
                 title={r.name}
-                description={`${(r.profiles as { email: string })?.email} · ${sub?.plan ?? "standard"} · ${branchCount} branches · ${formatSAR(mrr, locale)}/mo · last active ${lastActive}`}
+                description={`${(r.profiles as { email: string })?.email} · ${sub?.paid_branch_limit ?? branchCount} paid slots · ${branchCount} branches · ${formatSAR(mrr, locale)}/mo · last active ${lastActive}`}
                 trailing={<StatusPill status={vocab} />}
               />
             );

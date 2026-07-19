@@ -1,42 +1,46 @@
 @import "tailwindcss";
 
-/* Scop final design — teal / cream tokens from Scop Landing Page.dc.html */
+/* Mudir design system — Design Summary
+   Primary #013F32 · Lime #E7FE25 · Ink #161616 · BG #FDFDFD
+   Type: Baloo 2 / Inter / JetBrains Mono (+ Cairo for Arabic) */
 
 :root {
-  --accent: #43978d;
-  --accent-hover: #1f5c54;
-  --accent-muted: rgba(67, 151, 141, 0.12);
+  --accent: #013f32;
+  --accent-hover: #012a22;
+  --accent-muted: rgba(1, 63, 50, 0.08);
   --accent-contrast: #ffffff;
-  --deep-palm: #264d59;
+  --deep-palm: #013f32;
+  --forest: #013f32;
+  --lime: #e7fe25;
 
-  --clay: #d46c4e;
-  --clay-hover: #9c3f26;
-  --clay-muted: rgba(212, 108, 78, 0.12);
+  --clay: #e8697c;
+  --clay-hover: #d14d62;
+  --clay-muted: rgba(232, 105, 124, 0.12);
 
-  --gold: #f9ad6a;
-  --gold-muted: #fff3e6;
+  --gold: #e0a23b;
+  --gold-muted: rgba(224, 162, 59, 0.14);
 
-  --palm: #43978d;
-  --palm-hover: #1f5c54;
-  --palm-muted: rgba(67, 151, 141, 0.12);
+  --palm: #013f32;
+  --palm-hover: #012a22;
+  --palm-muted: rgba(1, 63, 50, 0.08);
 
-  --on-track: #1f5c54;
-  --on-track-bg: rgba(31, 92, 84, 0.1);
-  --behind: #a85a1e;
-  --behind-bg: #fff3e6;
-  --needs-attention: #d46c4e;
-  --needs-attention-bg: rgba(212, 108, 78, 0.1);
-  --info: #43978d;
-  --info-bg: rgba(67, 151, 141, 0.1);
+  --on-track: #37b788;
+  --on-track-bg: rgba(55, 183, 136, 0.12);
+  --behind: #e0a23b;
+  --behind-bg: rgba(224, 162, 59, 0.14);
+  --needs-attention: #e8697c;
+  --needs-attention-bg: rgba(232, 105, 124, 0.12);
+  --info: #7c86e8;
+  --info-bg: rgba(124, 134, 232, 0.12);
 
-  --bg: #f6f4ee;
-  --bg-secondary: #eef1ef;
+  --bg: #fdfdfd;
+  --bg-secondary: #f4f4f2;
   --card: #ffffff;
-  --border: #e2e6e4;
-  --divider: #e2e6e4;
-  --ink: #1c2427;
-  --ink-soft: #57646b;
-  --ink-faint: #93a0a2;
+  --border: rgba(22, 22, 22, 0.1);
+  --divider: rgba(22, 22, 22, 0.08);
+  --ink: #161616;
+  --ink-soft: rgba(22, 22, 22, 0.6);
+  --ink-faint: rgba(22, 22, 22, 0.4);
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
@@ -44,14 +48,16 @@
   --radius-xl: 1.5rem;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(15, 45, 32, 0.04);
-  --shadow-md: 0 12px 40px rgba(15, 45, 32, 0.08);
+  --shadow-sm: 0 1px 2px rgba(1, 63, 50, 0.04);
+  --shadow-md: 0 12px 40px rgba(1, 63, 50, 0.1);
 
-  /* LTR default: Inter (English). RTL overrides below use Cairo (Arabic). */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-baloo), ui-sans-serif, system-ui, sans-serif;
   --font-arabic: var(--font-cairo), sans-serif;
-  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  /* Back-compat aliases used across app shells */
+  --font-outfit: var(--font-baloo);
+  --font-ibm-plex-mono: var(--font-jetbrains);
 
   --motion-fast: 150ms;
   --motion-default: 250ms;
@@ -106,6 +112,8 @@ html[dir="rtl"] {
   --color-accent-muted: var(--accent-muted);
   --color-accent-contrast: var(--accent-contrast);
   --color-deep-palm: var(--deep-palm);
+  --color-forest: var(--forest);
+  --color-lime: var(--lime);
   --color-clay: var(--clay);
   --color-clay-hover: var(--clay-hover);
   --color-clay-muted: var(--clay-muted);
@@ -264,9 +272,9 @@ html[dir="rtl"] {
   }
 
   .panel-header h2 {
-    font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-baloo), ui-sans-serif, system-ui, sans-serif;
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 700;
   }
 
   .panel-body {
@@ -361,20 +369,20 @@ html[dir="rtl"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    background-color: var(--deep-palm);
+    border-radius: 999px;
+    background-color: var(--forest);
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
     font-weight: 600;
     color: white;
-    box-shadow: 0 8px 24px rgba(38, 77, 89, 0.18);
+    box-shadow: 0 8px 24px rgba(1, 63, 50, 0.18);
     transition: background-color var(--motion-fast) var(--ease-out),
       opacity var(--motion-fast) var(--ease-out),
       transform var(--motion-fast) var(--ease-out);
   }
 
   .btn-primary:hover {
-    background-color: #1d3d47;
+    background-color: var(--accent-hover);
   }
 
   .btn-primary:active {
@@ -480,14 +488,14 @@ html[dir="rtl"] {
   }
 
   .nav-link-active {
-    background-color: #1b4332;
-    color: #f7f5f0;
+    background-color: #013f32;
+    color: #fdfdfd;
     font-weight: 600;
   }
 
   .nav-link-active:hover {
-    background-color: #1b4332;
-    color: #f7f5f0;
+    background-color: #013f32;
+    color: #fdfdfd;
   }
 
   .pricing-box {

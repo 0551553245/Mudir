@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { createManager, deleteManager } from "@/lib/actions/owner";
 import { Button, Input, Select, Modal, PageHeader, EmptyState } from "@/components/ui";
 import { PanelBlock, FeatureRow } from "@/components/panel-block";
@@ -30,6 +30,7 @@ export function ManagersClient({
 }: ManagersClientProps) {
   const t = useTranslations("owner");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,6 +50,7 @@ export function ManagersClient({
     setError("");
     const formData = new FormData(e.currentTarget);
     formData.set("restaurant_id", restaurantId);
+    formData.set("locale", locale);
     const result = await createManager(formData);
     if (result.error) {
       setError(result.error);

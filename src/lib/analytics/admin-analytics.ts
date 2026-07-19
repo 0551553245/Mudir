@@ -74,7 +74,13 @@ export function computeAdminSummary(
   const breakdown = computeSubscriptionBreakdown(subscriptions);
   const estimatedMrr = subscriptions
     .filter((s) => s.status === "active" || s.status === "trialing")
-    .reduce((sum, s) => sum + s.branch_count * BRANCH_PRICE_SAR, 0);
+    .reduce((sum, s) => {
+      const fromTotal = Number(s.total_price_sar);
+      if (!Number.isNaN(fromTotal) && fromTotal > 0) return sum + fromTotal;
+      return (
+        sum + (s.paid_branch_limit || s.branch_count) * BRANCH_PRICE_SAR
+      );
+    }, 0);
 
   return {
     totalRestaurants: restaurants.length,

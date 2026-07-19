@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { completeOwnerSignup } from "@/lib/actions/billing";
 import { Input, Button } from "@/components/ui";
 import { AuthShell } from "@/components/auth-shell";
-import { cn } from "@/lib/utils";
+import { cn, formatSAR } from "@/lib/utils";
+import { PRICE_PER_BRANCH_SAR } from "@/lib/supabase/types";
 
 const inputClass =
   "rounded-[10px] border-border bg-bg px-3.5 py-[11px] text-[13.5px]";
@@ -14,18 +16,23 @@ const inputClass =
 export default function SignupPage() {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [fullName, setFullName] = useState("");
   const [restaurantName, setRestaurantName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [branchCount, setBranchCount] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const totalPriceSar = branchCount * PRICE_PER_BRANCH_SAR;
+  const managerCap = branchCount * 2;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (step !== 3) return;
+    if (step !== 4) return;
 
     setLoading(true);
     setError("");
@@ -56,11 +63,15 @@ export default function SignupPage() {
       return;
     }
 
-    if (restaurantName) {
-      await supabase
-        .from("restaurants")
-        .update({ name: restaurantName })
-        .eq("owner_user_id", authData.user.id);
+    const finish = await completeOwnerSignup({
+      restaurantName,
+      branchCount,
+    });
+
+    if (finish.error) {
+      setError(finish.error);
+      setLoading(false);
+      return;
     }
 
     router.refresh();
@@ -79,24 +90,34 @@ export default function SignupPage() {
     setStep(3);
   }
 
+  function goNextFromStep3(e: React.FormEvent) {
+    e.preventDefault();
+    if (branchCount < 1) return;
+    setStep(4);
+  }
+
   const stepTitle =
     step === 1
       ? t("signupTitle")
       : step === 2
         ? t("stepContactTitle")
-        : t("stepConfirmTitle");
+        : step === 3
+          ? t("stepBranchesTitle")
+          : t("stepConfirmTitle");
   const stepSub =
     step === 1
       ? t("signupSubtitle")
       : step === 2
         ? t("stepContactSub")
-        : t("stepConfirmSub");
+        : step === 3
+          ? t("stepBranchesSub")
+          : t("stepConfirmSub");
 
   return (
     <AuthShell hideHeader>
       <div className="flex flex-col gap-[18px]">
         <div className="flex justify-center gap-1.5" aria-hidden>
-          {([1, 2, 3] as const).map((n) => (
+          {([1, 2, 3, 4] as const).map((n) => (
             <div
               key={n}
               className={cn(
@@ -188,13 +209,80 @@ export default function SignupPage() {
                 type="submit"
                 className="flex-[2] rounded-[10px] bg-accent py-[13px] text-[14.5px] font-semibold text-white hover:bg-accent-hover"
               >
-                {t("nextConfirm")}
+                {t("nextBranches")}
               </Button>
             </div>
           </form>
         ) : null}
 
         {step === 3 ? (
+          <form onSubmit={goNextFromStep3} className="flex flex-col gap-[18px]">
+            <div className="flex items-center justify-center gap-4">
+              <button
+                type="button"
+                aria-label="Decrease"
+                onClick={() => setBranchCount((n) => Math.max(1, n - 1))}
+                className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-border bg-bg text-xl font-semibold text-deep-palm hover:border-accent"
+              >
+                −
+              </button>
+              <div className="min-w-[4rem] text-center">
+                <div className="font-[family-name:var(--font-outfit)] text-4xl font-semibold text-deep-palm">
+                  {branchCount}
+                </div>
+                <div className="text-[11.5px] text-ink-faint">
+                  {t("branchesLabel")}
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label="Increase"
+                onClick={() => setBranchCount((n) => Math.min(9, n + 1))}
+                className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-border bg-bg text-xl font-semibold text-deep-palm hover:border-accent"
+              >
+                +
+              </button>
+            </div>
+
+            <div className="rounded-[14px] border border-border bg-bg p-4 text-center">
+              <p className="font-[family-name:var(--font-outfit)] text-2xl font-semibold text-deep-palm">
+                {formatSAR(totalPriceSar, locale)}
+                <span className="text-sm font-medium text-ink-soft">
+                  {" "}
+                  / {t("perMonth")}
+                </span>
+              </p>
+              <p className="mt-2 text-[12.5px] text-ink-soft">
+                {t("managersIncluded", { count: managerCap })}
+              </p>
+              <p className="mt-1 text-[12px] text-ink-faint">
+                {t("priceBreakdown", {
+                  branches: branchCount,
+                  price: PRICE_PER_BRANCH_SAR,
+                })}
+              </p>
+            </div>
+
+            <div className="flex gap-2.5">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setStep(2)}
+                className="flex-1 rounded-[10px] py-[13px] text-[14.5px]"
+              >
+                {tc("back")}
+              </Button>
+              <Button
+                type="submit"
+                className="flex-[2] rounded-[10px] bg-accent py-[13px] text-[14.5px] font-semibold text-white hover:bg-accent-hover"
+              >
+                {t("nextConfirm")}
+              </Button>
+            </div>
+          </form>
+        ) : null}
+
+        {step === 4 ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
             <div className="rounded-[14px] border border-accent/40 bg-[rgba(67,151,141,0.06)] p-4">
               <div className="flex items-start justify-between gap-2">
@@ -209,7 +297,13 @@ export default function SignupPage() {
                 {t("trialPlanDesc")}
               </p>
               <p className="mt-2.5 font-[family-name:var(--font-outfit)] text-lg font-semibold text-deep-palm">
-                {t("trialPlanPrice")}
+                {formatSAR(totalPriceSar, locale)}/{t("perMonth")}
+              </p>
+              <p className="mt-1 text-[12.5px] text-ink-soft">
+                {t("afterTrialNote", {
+                  branches: branchCount,
+                  managers: managerCap,
+                })}
               </p>
               <p className="mt-3 border-t border-border pt-3 text-[12.5px] text-ink-soft">
                 <span className="font-semibold text-ink">{restaurantName}</span>
@@ -228,7 +322,7 @@ export default function SignupPage() {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 className="flex-1 rounded-[10px] py-[13px] text-[14.5px]"
                 disabled={loading}
               >

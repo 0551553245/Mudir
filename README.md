@@ -51,9 +51,11 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Business rules
 
-- **50 SAR/branch/month** — billing wired in Phase 2 (Moyasar)
-- **14-day free trial** — no card required
-- **Max 2 managers per branch** — enforced at DB level
+- **50 SAR/branch/month** — `PRICE_PER_BRANCH_SAR` / `BRANCH_PRICE_SAR` (single constant)
+- **Paid slots** — `subscriptions.paid_branch_limit`; deleting a branch does **not** reduce the limit (no refund until renewal)
+- **Upgrade** — at limit, pay +50 SAR to increment `paid_branch_limit` by 1
+- **14-day free trial** — no card required; signup chooses branch count (slots)
+- **Max 2 managers per branch** — enforced in DB trigger + `createManager` server action
 - **Task windows** — rolling: daily = 24h, weekly = 7d, monthly = 30d from last completion
 - **All-branch items** — new branches automatically inherit tasks/standards/events with `branch_id = null`
 

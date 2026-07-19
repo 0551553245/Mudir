@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import {
-  Outfit,
+  Baloo_2,
   Inter,
-  IBM_Plex_Mono,
+  JetBrains_Mono,
   Cairo,
 } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -13,10 +13,10 @@ import { isRtl } from "@/i18n/config";
 import { ForceLightMode } from "@/components/force-light-mode";
 import "../globals.css";
 
-const outfit = Outfit({
+const baloo = Baloo_2({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-outfit",
+  variable: "--font-baloo",
 });
 
 const inter = Inter({
@@ -25,10 +25,10 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-ibm-plex-mono",
+  variable: "--font-jetbrains",
 });
 
 const cairo = Cairo({
@@ -38,8 +38,9 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "Scoop — Restaurant Operations",
-  description: "Bilingual restaurant operations platform for Saudi Arabia",
+  title: "Mudir — Restaurant Operations",
+  description:
+    "Bilingual restaurant operations platform for Saudi Arabia — checklists, food safety, and scheduling.",
 };
 
 export function generateStaticParams() {
@@ -54,22 +55,22 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "ar" | "en")) {
+  if (!routing.locales.includes(locale as "en" | "ar")) {
     notFound();
   }
 
   setRequestLocale(locale);
   const messages = await getMessages();
-  const dir = isRtl(locale) ? "rtl" : "ltr";
+  const dir = isRtl(locale as "en" | "ar") ? "rtl" : "ltr";
 
   return (
     <html
       lang={locale}
       dir={dir}
-      className={`${outfit.variable} ${inter.variable} ${ibmPlexMono.variable} ${cairo.variable}`}
+      className={`${baloo.variable} ${inter.variable} ${jetbrains.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans">
+      <body className="min-h-screen bg-bg font-sans text-ink antialiased">
         <ForceLightMode />
         <NextIntlClientProvider messages={messages}>
           {children}

@@ -28,8 +28,11 @@ export default async function BranchesPage() {
     <BranchesClient
       branches={branches ?? []}
       restaurantId={restaurant.id}
-      canAddBranch={access?.canAddBranch ?? true}
+      canAddBranch={access?.canAddBranch ?? false}
       blockReason={blockReason}
+      paidBranchLimit={access?.paidBranchLimit ?? 0}
+      moyasarConfigured={billing?.moyasarConfigured ?? false}
+      publishableKey={billing?.publishableKey ?? null}
     />
   );
 }

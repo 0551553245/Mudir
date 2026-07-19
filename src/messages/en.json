@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Scop",
+    "appName": "Mudir",
     "tagline": "Restaurant operations, simplified",
     "save": "Save",
     "cancel": "Cancel",
@@ -62,8 +62,16 @@
     "stepConfirmTitle": "Confirm & start",
     "stepConfirmSub": "14-day free trial · No credit card required.",
     "nextContact": "Continue",
+    "nextBranches": "Continue",
     "nextConfirm": "Continue",
     "completeRegistration": "Start free trial",
+    "stepBranchesTitle": "How many branches?",
+    "stepBranchesSub": "You can add more later — each branch is 50 SAR / month.",
+    "branchesLabel": "branches",
+    "perMonth": "month",
+    "managersIncluded": "Includes up to {count} branch managers total (2 per branch)",
+    "priceBreakdown": "{branches} × {price} SAR",
+    "afterTrialNote": "{branches} branches · up to {managers} managers · billed monthly after trial",
     "trialPlanTitle": "14-day free trial",
     "trialPlanBadge": "Included",
     "trialPlanDesc": "Full owner dashboard · Multi-branch ready · SAR pricing after trial",
@@ -368,7 +376,11 @@
     "updatePlan": "Update plan",
     "planUpdated": "Plan updated successfully.",
     "processing": "Processing…",
-    "moyasarNotConfigured": "Moyasar keys are not configured. Add them to .env.local."
+    "moyasarNotConfigured": "Moyasar keys are not configured. Add them to .env.local.",
+    "branchLimitTitle": "Branch limit reached",
+    "branchLimitBody": "You've used all {count} branches on your plan.",
+    "addBranchPay": "Add 1 branch — {price}/month",
+    "managersIncludedNote": "Includes up to 2 branch managers per branch (not sold separately)."
   },
   "manager": {
     "progress": "{done} of {total} done",

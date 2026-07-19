@@ -8,7 +8,7 @@ import {
   evaluateSubscription,
   getBranchBlockReason,
 } from "@/lib/billing/subscription";
-import { ENTERPRISE_BRANCH_THRESHOLD } from "@/lib/supabase/types";
+import { ENTERPRISE_BRANCH_THRESHOLD, MAX_MANAGERS_PER_BRANCH } from "@/lib/supabase/types";
 import { syncBranchCount } from "@/lib/actions/billing";
 
 async function getOwnerSubscriptionContext() {
@@ -105,9 +105,27 @@ export async function createManager(formData: FormData) {
   const fullName = formData.get("full_name") as string;
   const branchId = formData.get("branch_id") as string;
   const restaurantId = formData.get("restaurant_id") as string;
+  const locale = (formData.get("locale") as string) ?? "en";
 
-  const { createServiceClient } = await import("@/lib/supabase/admin");
+  if (restaurantId !== ctx.restaurant.id) {
+    return { error: "Unauthorized" };
+  }
+
   const admin = createServiceClient();
+
+  const { count: managerCount } = await admin
+    .from("managers")
+    .select("id", { count: "exact", head: true })
+    .eq("branch_id", branchId);
+
+  if ((managerCount ?? 0) >= MAX_MANAGERS_PER_BRANCH) {
+    return {
+      error:
+        locale === "ar"
+          ? "هذا الفرع لديه مديران بالفعل. أزل أحدهم قبل إضافة آخر."
+          : "This branch already has 2 managers. Remove one before adding another.",
+    };
+  }
 
   const { data: authData, error: authError } =
     await admin.auth.admin.createUser({
@@ -127,11 +145,15 @@ export async function createManager(formData: FormData) {
     role: "manager",
   });
 
-  const { data, error } = await supabase.from("managers").insert({
-    user_id: authData.user.id,
-    branch_id: branchId,
-    restaurant_id: restaurantId,
-  }).select().single();
+  const { data, error } = await supabase
+    .from("managers")
+    .insert({
+      user_id: authData.user.id,
+      branch_id: branchId,
+      restaurant_id: restaurantId,
+    })
+    .select()
+    .single();
 
   if (error) return { error: error.message };
 

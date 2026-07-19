@@ -98,7 +98,7 @@ export function BillingClient({
       element: formRef.current,
       amount: access.monthlyAmountHalalas,
       currency: "SAR",
-      description: `Scop — ${access.branchCount} branches`,
+      description: `Scop — ${access.paidBranchLimit} branches`,
       publishable_api_key: publishableKey,
       callback_url: `${appUrl}/api/billing/callback?locale=${locale}`,
       supported_networks: ["visa", "mastercard", "mada"],
@@ -108,7 +108,7 @@ export function BillingClient({
       },
       metadata: {
         restaurant_id: restaurant.id,
-        branch_count: String(access.branchCount),
+        branch_count: String(access.paidBranchLimit),
         payment_type: needsUpgrade ? "upgrade" : "subscription",
       },
       on_completed: async function (payment: {
@@ -132,7 +132,7 @@ export function BillingClient({
     scriptReady,
     publishableKey,
     access.monthlyAmountHalalas,
-    access.branchCount,
+    access.paidBranchLimit,
     restaurant.id,
     appUrl,
     locale,
@@ -193,11 +193,17 @@ export function BillingClient({
             {access.isEnterprise ? "—" : formatSAR(access.monthlyAmountSar, locale)}
           </p>
           <p className="mt-2 text-sm opacity-90">
-            {formatSAR(BRANCH_PRICE_SAR, locale)} × {access.branchCount}{" "}
+            {formatSAR(BRANCH_PRICE_SAR, locale)} × {access.paidBranchLimit}{" "}
             {locale === "ar" ? "فروع" : "branches"}
           </p>
           <ul className="mt-6 space-y-2 text-sm">
             <li>✓ {t("branchCount", { count: access.branchCount })}</li>
+            <li>
+              ✓{" "}
+              {locale === "ar"
+                ? `${access.paidBranchLimit} خانات مدفوعة`
+                : `${access.paidBranchLimit} paid branch slots`}
+            </li>
             <li>✓ {locale === "ar" ? "مديران لكل فرع" : "2 managers per branch included"}</li>
             {access.nextInvoiceDate && (
               <li>

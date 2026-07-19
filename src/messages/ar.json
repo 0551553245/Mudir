@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "سكوب",
+    "appName": "مدير",
     "tagline": "عمليات المطاعم، ببساطة",
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -62,8 +62,16 @@
     "stepConfirmTitle": "تأكيد والبدء",
     "stepConfirmSub": "تجربة مجانية 14 يوماً · لا حاجة لبطاقة ائتمان.",
     "nextContact": "متابعة",
+    "nextBranches": "متابعة",
     "nextConfirm": "متابعة",
     "completeRegistration": "ابدأ التجربة المجانية",
+    "stepBranchesTitle": "كم عدد الفروع؟",
+    "stepBranchesSub": "يمكنك إضافة المزيد لاحقًا — كل فرع بـ 50 ر.س شهريًا.",
+    "branchesLabel": "فروع",
+    "perMonth": "شهر",
+    "managersIncluded": "يشمل حتى {count} مدير فرع إجماليًا (2 لكل فرع)",
+    "priceBreakdown": "{branches} × {price} ر.س",
+    "afterTrialNote": "{branches} فروع · حتى {managers} مدير · يُفوتر شهريًا بعد التجربة",
     "trialPlanTitle": "تجربة مجانية 14 يوماً",
     "trialPlanBadge": "مشمول",
     "trialPlanDesc": "لوحة مالك كاملة · جاهز لتعدد الفروع · تسعير بالريال بعد التجربة",
@@ -363,7 +371,11 @@
     "updatePlan": "تحديث الخطة",
     "planUpdated": "تم تحديث الخطة بنجاح.",
     "processing": "جاري المعالجة…",
-    "moyasarNotConfigured": "مفاتيح Moyasar غير مُعدّة. أضفها في .env.local."
+    "moyasarNotConfigured": "مفاتيح Moyasar غير مُعدّة. أضفها في .env.local.",
+    "branchLimitTitle": "تم بلوغ حد الفروع",
+    "branchLimitBody": "استخدمت كل فروع خطتك ({count}).",
+    "addBranchPay": "أضف فرعًا واحدًا — {price}/شهر",
+    "managersIncludedNote": "يشمل حتى مديرَي فرع لكل فرع (غير مباع بشكل منفصل)."
   },
   "manager": {
     "progress": "{done} من {total} مكتمل",

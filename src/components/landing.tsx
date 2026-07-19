@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MudirWordmark } from "@/components/mudir-logo";
 
 type Lang = "en" | "ar";
 
@@ -21,8 +22,8 @@ const WHATSAPP_URL = "https://wa.me/966551553245";
 const features = [
   {
     Icon: CheckSquare,
-    bg: "bg-[#EAF4F2]",
-    color: "text-[#1F5C54]",
+    bg: "bg-[rgba(55,183,136,0.12)]",
+    color: "text-[#37B788]",
     title: { en: "Custom checklists", ar: "قوائم مخصصة" },
     desc: {
       en: "Build daily, weekly, or monthly checklists — with photo, note, or number proof required per item.",
@@ -31,8 +32,8 @@ const features = [
   },
   {
     Icon: Thermometer,
-    bg: "bg-[#FFF3E6]",
-    color: "text-[#A85A1E]",
+    bg: "bg-[rgba(224,162,59,0.14)]",
+    color: "text-[#E0A23B]",
     title: { en: "Food-safety standards", ar: "معايير سلامة الغذاء" },
     desc: {
       en: "Set safe ranges once. Pass/fail is calculated automatically from what managers enter.",
@@ -41,8 +42,8 @@ const features = [
   },
   {
     Icon: CalendarDays,
-    bg: "bg-[#E7EDEF]",
-    color: "text-[#17323A]",
+    bg: "bg-[rgba(124,134,232,0.12)]",
+    color: "text-[#7C86E8]",
     title: { en: "Scheduling", ar: "الجدولة" },
     desc: {
       en: "Plan training, inspections and audits across one branch or every branch at once.",
@@ -51,8 +52,8 @@ const features = [
   },
   {
     Icon: BarChart3,
-    bg: "bg-[#EAF4F2]",
-    color: "text-[#1F5C54]",
+    bg: "bg-[rgba(1,63,50,0.08)]",
+    color: "text-forest",
     title: { en: "Real-time reporting", ar: "تقارير لحظية" },
     desc: {
       en: "Completion and pass rates roll up live — no waiting for a manager’s end-of-day message.",
@@ -61,8 +62,8 @@ const features = [
   },
   {
     Icon: Building2,
-    bg: "bg-[#FBEAE4]",
-    color: "text-[#9C3F26]",
+    bg: "bg-[rgba(232,105,124,0.12)]",
+    color: "text-[#E8697C]",
     title: { en: "Multi-branch by design", ar: "متعدد الفروع بالتصميم" },
     desc: {
       en: "Every branch has its own manager logins, data, and view — fully isolated, fully yours.",
@@ -71,8 +72,8 @@ const features = [
   },
   {
     Icon: Globe,
-    bg: "bg-[#FFF3E6]",
-    color: "text-[#A85A1E]",
+    bg: "bg-[rgba(224,162,59,0.14)]",
+    color: "text-[#E0A23B]",
     title: { en: "Fully bilingual", ar: "ثنائي اللغة بالكامل" },
     desc: {
       en: "Arabic and English with true right-to-left layout — not a translated afterthought.",
@@ -124,8 +125,8 @@ const faqs = [
   },
   {
     q: {
-      en: "Is Scop available in Arabic?",
-      ar: "هل سكوب متاح بالعربية؟",
+      en: "Is Mudir available in Arabic?",
+      ar: "هل مدير متاح بالعربية؟",
     },
     a: {
       en: "Yes, fully — with true right-to-left layout across every screen, not just translated text.",
@@ -136,7 +137,7 @@ const faqs = [
 
 const copy = {
   en: {
-    appName: "Scop",
+    appName: "Mudir",
     navFeatures: "Features",
     navPricing: "Pricing",
     navFaq: "FAQ",
@@ -145,7 +146,7 @@ const copy = {
     heroKicker: "For multi-branch restaurants",
     heroTitle: "Manage every branch like it’s your only one.",
     heroSub:
-      "Scop replaces scattered WhatsApp checklists with live task tracking, food-safety logs, and scheduling — across every branch, in real time.",
+      "Mudir replaces scattered WhatsApp checklists with live task tracking, food-safety logs, and scheduling — across every branch, in real time.",
     heroCtaPrimary: "Start 14-day free trial",
     heroCtaSecondary: "See how it works",
     heroNote: "No card required · Cancel anytime",
@@ -184,14 +185,14 @@ const copy = {
     faqTitle: "Frequently asked",
     ctaTitle: "Ready to see it running your branches?",
     ctaSub: "Start your 14-day free trial — no card required.",
-    footerCopy: "© 2026 Scop. Made for restaurants in Saudi Arabia.",
+    footerCopy: "© 2026 Mudir. Made for restaurants in Saudi Arabia.",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
     refund: "Refund Policy",
     adminLogin: "Admin login",
   },
   ar: {
-    appName: "سكوب",
+    appName: "مدير",
     navFeatures: "المزايا",
     navPricing: "الأسعار",
     navFaq: "الأسئلة الشائعة",
@@ -200,7 +201,7 @@ const copy = {
     heroKicker: "لمطاعم متعددة الفروع",
     heroTitle: "أدر كل فرع وكأنه الفرع الوحيد لديك.",
     heroSub:
-      "يستبدل سكوب قوائم واتساب المبعثرة بمتابعة مهام مباشرة، وسجلات سلامة غذاء، وجدولة — عبر كل فرع، لحظة بلحظة.",
+      "يستبدل مدير قوائم واتساب المبعثرة بمتابعة مهام مباشرة، وسجلات سلامة غذاء، وجدولة — عبر كل فرع، لحظة بلحظة.",
     heroCtaPrimary: "ابدأ تجربة مجانية 14 يومًا",
     heroCtaSecondary: "شاهد كيف يعمل",
     heroNote: "بدون بطاقة ائتمان · ألغِ في أي وقت",
@@ -239,7 +240,7 @@ const copy = {
     faqTitle: "الأسئلة الشائعة",
     ctaTitle: "جاهز لتراه يدير فروعك؟",
     ctaSub: "ابدأ تجربتك المجانية لمدة 14 يومًا — بدون بطاقة ائتمان.",
-    footerCopy: "© 2026 سكوب. صُنع لمطاعم المملكة العربية السعودية.",
+    footerCopy: "© 2026 مدير. صُنع لمطاعم المملكة العربية السعودية.",
     privacy: "سياسة الخصوصية",
     terms: "شروط الخدمة",
     refund: "سياسة الاسترداد",
@@ -272,65 +273,44 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
       )}
     >
       <header className="mx-auto flex max-w-[1280px] items-center justify-between px-5 py-5 md:px-10">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-deep-palm font-[family-name:var(--font-outfit)] text-[17px] font-bold text-white">
-            S
-          </span>
-          <span className="font-[family-name:var(--font-outfit)] text-xl font-bold text-deep-palm">
-            {t.appName}
-          </span>
-        </div>
+        <MudirWordmark name={t.appName} size={34} />
 
         <nav className="hidden items-center gap-8 md:flex">
-          <button
-            type="button"
-            onClick={() => scrollTo("features")}
-            className="text-sm font-medium text-ink-soft transition-colors hover:text-deep-palm"
-          >
-            {t.navFeatures}
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollTo("pricing")}
-            className="text-sm font-medium text-ink-soft transition-colors hover:text-deep-palm"
-          >
-            {t.navPricing}
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollTo("faq")}
-            className="text-sm font-medium text-ink-soft transition-colors hover:text-deep-palm"
-          >
-            {t.navFaq}
-          </button>
+          {(
+            [
+              ["features", t.navFeatures],
+              ["pricing", t.navPricing],
+              ["faq", t.navFaq],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => scrollTo(id)}
+              className="text-sm font-medium text-ink-soft transition-colors hover:text-forest"
+            >
+              {label}
+            </button>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="flex gap-0.5 rounded-[10px] border border-border bg-card p-[3px] font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-semibold">
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={cn(
-                "rounded-[7px] px-2.5 py-1 transition-colors",
-                lang === "en"
-                  ? "bg-deep-palm text-white"
-                  : "bg-transparent text-ink-soft"
-              )}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("ar")}
-              className={cn(
-                "rounded-[7px] px-2.5 py-1 transition-colors",
-                lang === "ar"
-                  ? "bg-deep-palm text-white"
-                  : "bg-transparent text-ink-soft"
-              )}
-            >
-              AR
-            </button>
+          <div className="flex gap-0.5 rounded-full border border-border bg-card p-[3px] font-[family-name:var(--font-jetbrains)] text-[11px] font-semibold">
+            {(["en", "ar"] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLang(l)}
+                className={cn(
+                  "rounded-full px-2.5 py-1 transition-colors",
+                  lang === l
+                    ? "bg-forest text-white"
+                    : "bg-transparent text-ink-soft"
+                )}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
           </div>
           <Link
             href="/login"
@@ -347,16 +327,16 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative mx-auto flex max-w-[1280px] flex-col items-center gap-12 overflow-hidden px-5 py-8 md:flex-row md:gap-12 md:px-10 md:py-[60px]">
-        <div className="pointer-events-none absolute -top-[60px] end-[-60px] h-[220px] w-[220px] animate-lp-float rounded-full bg-[radial-gradient(circle,#9ED0C755,transparent_70%)]" />
-        <div className="pointer-events-none absolute bottom-[-40px] start-[10%] h-40 w-40 animate-lp-float-2 rounded-full bg-[radial-gradient(circle,#F9AD6A33,transparent_70%)]" />
+      <section className="relative mx-auto flex max-w-[1280px] flex-col items-center gap-12 overflow-hidden px-5 py-8 md:flex-row md:gap-14 md:px-10 md:py-[60px]">
+        <div className="pointer-events-none absolute -top-16 end-[-40px] h-[240px] w-[240px] animate-lp-float rounded-full bg-[radial-gradient(circle,#E7FE2544,transparent_70%)]" />
+        <div className="pointer-events-none absolute bottom-[-50px] start-[8%] h-44 w-44 animate-lp-float-2 rounded-full bg-[radial-gradient(circle,#013F3222,transparent_70%)]" />
 
         <div className="relative z-10 min-w-0 flex-1 animate-lp-fade">
-          <span className="inline-block rounded-full bg-gold-muted px-3 py-1.5 font-[family-name:var(--font-ibm-plex-mono)] text-[11.5px] font-bold uppercase tracking-wide text-[#A85A1E]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(1,63,50,0.08)] px-3 py-1.5 font-[family-name:var(--font-jetbrains)] text-[11.5px] font-bold uppercase tracking-wide text-forest">
+            <span className="h-1.5 w-1.5 rounded-full bg-lime" />
             {t.heroKicker}
           </span>
-          <h1 className="mt-5 font-[family-name:var(--font-outfit)] text-[34px] font-bold leading-[1.08] tracking-tight text-deep-palm md:text-[52px]">
+          <h1 className="mt-5 font-[family-name:var(--font-baloo)] text-[36px] font-bold leading-[1.05] tracking-tight text-forest md:text-[56px]">
             {t.heroTitle}
           </h1>
           <p className="mt-5 max-w-[520px] text-[17px] leading-relaxed text-ink-soft">
@@ -372,52 +352,52 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
             <button
               type="button"
               onClick={() => scrollTo("features")}
-              className="rounded-xl border-[1.5px] border-border bg-transparent px-[26px] py-[15px] text-[15px] font-semibold text-deep-palm transition-colors hover:border-accent hover:bg-card"
+              className="rounded-full border-[1.5px] border-border bg-transparent px-[26px] py-[15px] text-[15px] font-semibold text-forest transition-colors hover:border-forest hover:bg-[rgba(1,63,50,0.04)]"
             >
               {t.heroCtaSecondary}
             </button>
           </div>
           <div className="mt-[22px] flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" strokeWidth={2.5} />
+            <Check className="h-4 w-4 text-[#37B788]" strokeWidth={2.5} />
             <span className="text-[13px] text-ink-faint">{t.heroNote}</span>
           </div>
         </div>
 
         <div className="relative z-10 w-full min-w-0 flex-1 animate-lp-fade">
-          <div className="rounded-[22px] border border-border bg-card p-[22px] shadow-[0_30px_70px_rgba(15,45,32,0.12)]">
+          <div className="rounded-[22px] border border-border bg-card p-[22px] shadow-[0_30px_70px_rgba(1,63,50,0.12)]">
             <div className="mb-4 flex items-center justify-between">
-              <span className="font-[family-name:var(--font-outfit)] text-[15px] font-semibold text-deep-palm">
+              <span className="font-[family-name:var(--font-baloo)] text-[15px] font-bold text-forest">
                 {t.mockTitle}
               </span>
-              <div className="flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1">
-                <span className="h-[7px] w-[7px] animate-lp-pulse rounded-full bg-accent" />
-                <span className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] font-semibold uppercase text-accent">
+              <div className="flex items-center gap-1.5 rounded-full bg-bg-secondary px-2.5 py-1">
+                <span className="h-[7px] w-[7px] animate-lp-pulse rounded-full bg-[#37B788]" />
+                <span className="font-[family-name:var(--font-jetbrains)] text-[10px] font-semibold uppercase text-[#37B788]">
                   {t.mockLive}
                 </span>
               </div>
             </div>
             <div className="mb-4 grid grid-cols-3 gap-2.5">
-              <div className="rounded-[14px] border-t-[3px] border-t-accent bg-bg p-3.5">
-                <div className="font-[family-name:var(--font-ibm-plex-mono)] text-[9.5px] uppercase text-ink-faint">
+              <div className="rounded-[14px] border-t-[3px] border-t-[#37B788] bg-bg-secondary p-3.5">
+                <div className="font-[family-name:var(--font-jetbrains)] text-[9.5px] uppercase text-ink-faint">
                   {t.mockDone}
                 </div>
-                <div className="mt-1 font-[family-name:var(--font-outfit)] text-[22px] font-semibold text-deep-palm">
+                <div className="mt-1 font-[family-name:var(--font-baloo)] text-[22px] font-bold text-forest">
                   26
                 </div>
               </div>
-              <div className="rounded-[14px] border-t-[3px] border-t-gold bg-bg p-3.5">
-                <div className="font-[family-name:var(--font-ibm-plex-mono)] text-[9.5px] uppercase text-ink-faint">
+              <div className="rounded-[14px] border-t-[3px] border-t-[#E0A23B] bg-bg-secondary p-3.5">
+                <div className="font-[family-name:var(--font-jetbrains)] text-[9.5px] uppercase text-ink-faint">
                   {t.mockPending}
                 </div>
-                <div className="mt-1 font-[family-name:var(--font-outfit)] text-[22px] font-semibold text-[#A85A1E]">
+                <div className="mt-1 font-[family-name:var(--font-baloo)] text-[22px] font-bold text-[#E0A23B]">
                   6
                 </div>
               </div>
-              <div className="rounded-[14px] border-t-[3px] border-t-[#D46C4E] bg-bg p-3.5">
-                <div className="font-[family-name:var(--font-ibm-plex-mono)] text-[9.5px] uppercase text-ink-faint">
+              <div className="rounded-[14px] border-t-[3px] border-t-[#E8697C] bg-bg-secondary p-3.5">
+                <div className="font-[family-name:var(--font-jetbrains)] text-[9.5px] uppercase text-ink-faint">
                   {t.mockMissed}
                 </div>
-                <div className="mt-1 font-[family-name:var(--font-outfit)] text-[22px] font-semibold text-[#9C3F26]">
+                <div className="mt-1 font-[family-name:var(--font-baloo)] text-[22px] font-bold text-[#E8697C]">
                   3
                 </div>
               </div>
@@ -426,15 +406,15 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
               {t.mockBranches.map((b) => (
                 <div
                   key={b.name}
-                  className="flex items-center justify-between rounded-lg border-b border-border px-1 py-2.5 transition-colors hover:bg-bg"
+                  className="flex items-center justify-between rounded-lg border-b border-border px-1 py-2.5 transition-colors hover:bg-bg-secondary"
                 >
                   <span className="text-[13px] font-semibold text-ink">
                     {b.name}
                   </span>
                   <span
                     className={cn(
-                      "font-[family-name:var(--font-ibm-plex-mono)] text-[11px] font-bold",
-                      b.pct >= 85 ? "text-[#1F5C54]" : "text-[#A85A1E]"
+                      "font-[family-name:var(--font-jetbrains)] text-[11px] font-bold",
+                      b.pct >= 85 ? "text-[#37B788]" : "text-[#E0A23B]"
                     )}
                   >
                     {b.pct}%
@@ -446,12 +426,11 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </section>
 
-      {/* Trust stats */}
       <section className="mx-auto max-w-[1280px] px-5 pb-[60px] md:px-10">
         <div className="grid grid-cols-2 gap-5 border-y border-border py-8 md:grid-cols-4">
           {t.trustStats.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="font-[family-name:var(--font-outfit)] text-[30px] font-bold text-deep-palm">
+              <div className="font-[family-name:var(--font-baloo)] text-[30px] font-bold text-forest">
                 {s.value}
               </div>
               <div className="mt-1 text-[13px] text-ink-faint">{s.label}</div>
@@ -460,14 +439,13 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </section>
 
-      {/* Features */}
       <section
         id="features"
         className="mx-auto max-w-[1280px] scroll-mt-24 px-5 pb-20 pt-5 md:px-10"
       >
         <div className="mx-auto mb-12 max-w-[640px] text-center">
-          <span className="font-mono-label text-accent">{t.featuresKicker}</span>
-          <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-[26px] font-semibold text-deep-palm md:text-[34px]">
+          <span className="font-mono-label text-forest">{t.featuresKicker}</span>
+          <h2 className="mt-3 font-[family-name:var(--font-baloo)] text-[28px] font-bold text-forest md:text-[36px]">
             {t.featuresTitle}
           </h2>
         </div>
@@ -475,7 +453,7 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
           {features.map((f) => (
             <div
               key={f.title.en}
-              className="rounded-[18px] border border-border bg-card p-[26px] transition-all hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(15,45,32,0.1)]"
+              className="rounded-[18px] border border-border bg-card p-[26px] transition-all hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(1,63,50,0.1)]"
             >
               <div
                 className={cn(
@@ -486,7 +464,7 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
               >
                 <f.Icon className="h-[22px] w-[22px]" strokeWidth={2} />
               </div>
-              <h3 className="font-[family-name:var(--font-outfit)] text-[16.5px] font-semibold text-ink">
+              <h3 className="font-[family-name:var(--font-baloo)] text-[17px] font-bold text-ink">
                 {f.title[lang]}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
@@ -497,25 +475,22 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </section>
 
-      {/* Pricing */}
       <section
         id="pricing"
-        className="scroll-mt-24 bg-deep-palm px-5 py-8 md:px-10 md:py-[60px]"
+        className="scroll-mt-24 bg-forest px-5 py-8 md:px-10 md:py-[60px]"
       >
         <div className="mx-auto max-w-[1280px]">
           <div className="mx-auto mb-12 max-w-[640px] text-center">
-            <span className="font-mono-label text-[#9ED0C7]">
-              {t.pricingKicker}
-            </span>
-            <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-[26px] font-semibold text-white md:text-[34px]">
+            <span className="font-mono-label text-lime">{t.pricingKicker}</span>
+            <h2 className="mt-3 font-[family-name:var(--font-baloo)] text-[28px] font-bold text-white md:text-[36px]">
               {t.pricingTitle}
             </h2>
-            <p className="mt-3 text-[15px] text-[#C7D9D5]">{t.pricingSub}</p>
+            <p className="mt-3 text-[15px] text-white/70">{t.pricingSub}</p>
           </div>
           <div className="flex justify-center">
             <div className="w-full max-w-[420px] rounded-[22px] bg-white p-9 transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
               <div className="flex items-baseline gap-2">
-                <span className="font-[family-name:var(--font-outfit)] text-[44px] font-bold text-deep-palm">
+                <span className="font-[family-name:var(--font-baloo)] text-[44px] font-bold text-forest">
                   50 SAR
                 </span>
                 <span className="text-sm text-ink-faint">{t.pricingPer}</span>
@@ -525,7 +500,7 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
                 {t.pricingFeatures.map((pf) => (
                   <div key={pf} className="flex items-center gap-2.5">
                     <Check
-                      className="h-4 w-4 shrink-0 text-accent"
+                      className="h-4 w-4 shrink-0 text-[#37B788]"
                       strokeWidth={2.5}
                     />
                     <span className="text-sm text-ink">{pf}</span>
@@ -543,7 +518,7 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-deep-palm"
+                  className="hover:text-forest"
                 >
                   {t.pricingEnterprise}
                 </a>
@@ -553,14 +528,13 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </section>
 
-      {/* FAQ */}
       <section
         id="faq"
         className="mx-auto max-w-[900px] scroll-mt-24 px-5 py-8 md:px-10 md:py-[60px]"
       >
         <div className="mb-10 text-center">
-          <span className="font-mono-label text-accent">{t.faqKicker}</span>
-          <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-[26px] font-semibold text-deep-palm md:text-[34px]">
+          <span className="font-mono-label text-forest">{t.faqKicker}</span>
+          <h2 className="mt-3 font-[family-name:var(--font-baloo)] text-[28px] font-bold text-forest md:text-[36px]">
             {t.faqTitle}
           </h2>
         </div>
@@ -572,10 +546,10 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
                 key={item.q.en}
                 type="button"
                 onClick={() => setOpenFaq(open ? null : i)}
-                className="rounded-[14px] border border-border bg-card px-5 py-[18px] text-start transition-colors hover:border-accent"
+                className="rounded-[14px] border border-border bg-card px-5 py-[18px] text-start transition-colors hover:border-forest"
               >
                 <div className="flex items-center justify-between gap-2.5">
-                  <span className="font-[family-name:var(--font-outfit)] text-[15px] font-semibold text-ink">
+                  <span className="font-[family-name:var(--font-baloo)] text-[15px] font-bold text-ink">
                     {item.q[lang]}
                   </span>
                   <ChevronDown
@@ -597,16 +571,16 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         </div>
       </section>
 
-      {/* Final CTA */}
       <section className="mx-auto max-w-[1280px] px-5 pb-[90px] md:px-10">
-        <div className="rounded-3xl border border-border bg-card px-10 py-14 text-center">
-          <h2 className="font-[family-name:var(--font-outfit)] text-[26px] font-semibold text-deep-palm md:text-[34px]">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-10 py-14 text-center">
+          <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-lime/30 blur-2xl" />
+          <h2 className="relative font-[family-name:var(--font-baloo)] text-[28px] font-bold text-forest md:text-[36px]">
             {t.ctaTitle}
           </h2>
-          <p className="mt-3 text-[15px] text-ink-soft">{t.ctaSub}</p>
+          <p className="relative mt-3 text-[15px] text-ink-soft">{t.ctaSub}</p>
           <Link
             href="/signup"
-            className="btn-primary mt-6 inline-flex px-[30px] py-[15px] text-[15px]"
+            className="btn-primary relative mt-6 inline-flex px-[30px] py-[15px] text-[15px]"
           >
             {t.heroCtaPrimary}
           </Link>
@@ -615,23 +589,16 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
 
       <footer className="border-t border-border px-5 py-8 md:px-10">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-deep-palm font-[family-name:var(--font-outfit)] text-xs font-bold text-white">
-              S
-            </span>
-            <span className="font-[family-name:var(--font-outfit)] text-sm font-semibold text-deep-palm">
-              {t.appName}
-            </span>
-          </div>
+          <MudirWordmark name={t.appName} size={24} />
           <span className="text-[12.5px] text-ink-faint">{t.footerCopy}</span>
           <div className="flex flex-wrap gap-4 text-xs text-ink-soft">
-            <Link href="/privacy-policy" className="hover:text-deep-palm">
+            <Link href="/privacy-policy" className="hover:text-forest">
               {t.privacy}
             </Link>
-            <Link href="/terms-of-service" className="hover:text-deep-palm">
+            <Link href="/terms-of-service" className="hover:text-forest">
               {t.terms}
             </Link>
-            <Link href="/refund-policy" className="hover:text-deep-palm">
+            <Link href="/refund-policy" className="hover:text-forest">
               {t.refund}
             </Link>
           </div>
@@ -639,7 +606,7 @@ export default function Landing({ initialLang = "en" }: { initialLang?: Lang }) 
         <div className="mx-auto mt-5 max-w-[1280px] text-center">
           <Link
             href="/admin/login"
-            className="text-[11.5px] font-medium text-ink-faint underline-offset-2 transition-colors hover:text-deep-palm hover:underline"
+            className="text-[11.5px] font-medium text-ink-faint underline-offset-2 transition-colors hover:text-forest hover:underline"
           >
             {t.adminLogin}
           </Link>
