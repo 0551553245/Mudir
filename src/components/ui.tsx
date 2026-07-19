@@ -93,12 +93,17 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-ink/20" onClick={onClose} />
-      <div className="panel-block relative z-10 w-full max-w-lg">
-        <div className="panel-header">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+      <div
+        className="absolute inset-0 bg-ink/20"
+        onClick={onClose}
+        aria-hidden
+      />
+      <div className="panel-block relative z-10 my-auto flex w-full max-w-lg max-h-[min(90dvh,900px)] flex-col overflow-hidden">
+        <div className="panel-header shrink-0">
           <h2 className="text-lg">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
             className="text-ink-faint hover:text-ink"
             aria-label="Close"
@@ -106,7 +111,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             ✕
           </button>
         </div>
-        <div className="panel-body">{children}</div>
+        <div className="panel-body min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {children}
+        </div>
       </div>
     </div>
   );
